@@ -1,0 +1,249 @@
+---
+title: "Hierarchical Linear Models"
+author: "John D. Lee and Linda Ng Boyle"
+date: 10/1/2018
+output:
+  ioslides_presentation:
+    widescreen: yes
+  beamer_presentation: default
+---
+<style>
+pre {
+  font-size: 18px;
+  line-height: 1.05;
+}
+</style>
+  
+   
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(cache = TRUE)
+
+#### Use caret to develop, tune and validate a range of data mining models ####
+# http://www.jstatsoft.org/v28/i05/paper
+
+library(tidyverse)
+library(skimr)
+library(lme4)
+library(lmerTest)
+library(psycho)
+set.seed(1)
+rm(list = ls(all = TRUE))
+```
+
+
+## A Common Challenge|Repeated measures 
+-- Multiple measures from the same person who might also be part of a group
+
+-- Multiple exposures across people to the same stimuli
+
+-- Repeated measures ANOVA accommodates correlated observations
+
+-- Multi-level general linear models go further and explicitly model grouping effects 
+
+-- Addresses Simpson's paradox, where individual trends don't reflect the aggregate trend
+
+
+## Simpson's Paradox
+```{r simpons_pardox, echo = TRUE, warnings=FALSE, fig.height=5.25, fig.width=6.5, echo=FALSE}
+library(scales)
+set.seed(123)
+n = 1000
+
+Education = rbinom(n, 2, 0.5)
+Neuroticism = rnorm(n) + Education
+Salary = Education * 2 + rnorm(n) - Neuroticism * 0.3
+Salary = sample(10000:11000,1) + rescale(Salary, to = c(0, 100000))
+Neuroticism = rescale(Neuroticism, to = c(0, 7))
+Education = factor(Education, labels = c("Low", "Medium", "High"))
+
+data <- data.frame(
+  Salary,
+  Neuroticism,
+  Education
+)
+
+ggplot(data, aes(Neuroticism, Salary)) +
+  #geom_point(alpha = .5, size = 4) + 
+  geom_point(aes(col = Education), alpha = .4, size = 2) + 
+  geom_smooth(aes(col = Education), method = 'lm') +
+  geom_smooth(method = 'lm') +
+  theme(legend.background = element_rect(fill = "transparent"),
+        legend.justification = c(0, 1),
+        legend.position = c(0, 1))+
+  theme_grey(base_size = 14)
+```
+<span style="font-size:.5em">http://rpubs.com/lakenp/simpsonsparadox</span>
+
+
+## Useful packages
+-- ``library(tidyverse)`` for ggplot2, dplyr
+
+-- ``library(skimr)`` for skim 
+
+-- ``library(lme4)`` for mixed effect, multi-level general linear models
+
+-- ``library(lmerTest)`` for extracting p-values
+
+-- ``library(psycho)`` for extracting APA reportable sentences
+
+
+## Effect of Sleep Disruption
+```{r facet_scatterplot_lm, echo = TRUE, warnings=FALSE, fig.height=3.75, fig.width=10.25}
+sleep.df = sleepstudy
+
+ggplot(sleep.df, aes(Days, Reaction)) + 
+   geom_point() +
+   geom_smooth(method = "lm") +
+   facet_grid(.~Subject)
+```
+
+
+## Uniform Effect of Sleep Disruption?  
+```{r facet_lm, echo = TRUE, warnings=FALSE, fig.height=4}
+sleep.fit = lm(Reaction ~ Days, sleep.df)
+
+sleep.df$prediction = predict(sleep.fit)
+
+summary(sleep.fit)
+```
+
+
+## Uniform Effect of Sleep Disruption? 
+```{r facet_scatterplot_overalllm, echo = TRUE, warnings=FALSE, fig.height=4, fig.width=10.25}
+
+ggplot(sleep.df, aes(Days, Reaction)) + 
+  geom_point(alpha = .4, size = 1) +
+  geom_point(aes(y=prediction), shape = 21) +
+  geom_line(aes(y=prediction)) + 
+  facet_grid(.~Subject)
+```
+
+
+
+
+## Random Effect for Intercept
+```{r lmer_int, echo = TRUE, warnings=FALSE, fig.height=4, fig.width=10.25}
+sleep_int.fit = lmer(Reaction ~ Days + (1|Subject), sleep.df)
+summary(sleep_int.fit)
+
+sleep.df$prediction_int = predict(sleep_int.fit)
+
+```
+
+
+## Random Effect for Intercept
+```{r facet_scatterplot_lm_int, echo = TRUE, warnings=FALSE, fig.height=4, fig.width=10.25}
+
+ggplot(sleep.df, aes(Days, Reaction)) + 
+  geom_point(alpha = .4, size = 1) +
+  geom_point(aes(y=prediction_int), shape = 21) +
+  geom_line(aes(y=prediction_int, group = Subject)) + 
+  facet_grid(.~Subject)
+
+```
+
+## Random Effect for Intercept and Slope
+```{r lmer_int_slope, echo = TRUE, warnings=FALSE, fig.height=4, fig.width=10.25}
+
+sleep_int_slope.fit = lmer(Reaction ~ Days + (Days|Subject), sleep.df)
+summary(sleep_int_slope.fit)
+
+sleep.df$prediction_int_slope = predict(sleep_int_slope.fit)
+
+```
+
+
+## Random Effects for Intercept and Slope
+```{r facet_scatterplot_lm_int_slope, echo = TRUE, warnings=FALSE, fig.height=4, fig.width=10.25}
+
+ggplot(sleep.df, aes(Days, Reaction)) + 
+  geom_point(alpha = .4, size = 1) +
+  geom_line(aes(y=prediction_int_slope, group = Subject)) + 
+  geom_point(aes(y=prediction_int_slope), shape = 21) +
+  facet_grid(.~Subject)
+
+```
+
+
+## Summary for Publication
+-- The "psycho" package provides functions for summarizing model output
+
+-- It creates a publication-ready summary table
+
+-- It can even create sentences describing the output
+
+-- Parameter estimates can be extracted for plotting
+
+```{r publication_summary1, echo = TRUE, warning=FALSE, fig.height=3,out.width=11}
+library(psycho)
+analyze(sleep_int_slope.fit, CI = 95) %>% 
+  summary(results, round = 2) %>% 
+  mutate(p = format_p(p)) %>% 
+  kable()
+
+
+```
+
+
+## Summary for Publication|psycho can create sentences describing the output
+```{r publication_summary2, echo = TRUE, warning=FALSE}
+analyze(sleep_int_slope.fit, CI = 95)
+```
+
+-The overall model predicting Reaction (formula = Reaction ~ Days + (Days | Subject)) has an total explanatory power (conditional R2) of 79.92%, in which the fixed effects explain 27.87% of the variance (marginal R2). 
+
+-The model's intercept is at 251.41 (SE = 6.82, 95% CI [237.68, 265.13]). Within this model:
+
+-The effect of Days is significant (beta = 10.47, SE = 1.55, 95% CI [7.36, 13.58], t(17) = 6.77, p < .001) and can be considered as medium (std. beta = 0.54, std. SE = 0.079).
+
+
+## Summary for Publication|Parameter estimates can also be extracted for plotting
+
+```{r publication_summary3, echo = TRUE, warning=FALSE, fig.height=3.}
+
+CI.lme.df = analyze(sleep_int_slope.fit)$summary
+
+ggplot(CI.lme.df, aes(Variable)) +
+    geom_hline(yintercept = 0, alpha = .5)+
+    geom_pointrange(aes(y = Coef, ymin= CI_lower, ymax = CI_higher)) +
+    coord_flip() +
+    labs(x = "", y = expression(Coefficient~and~95^{th}~CI))
+```
+
+
+## Exercise|Multi-level model fitting
+
+-- Fit a multi-level model with Subject as a random variable
+
+-- Use the ``analyze`` command from psych to extract an summmary of effects
+
+-- Plot the effect estimates
+
+```{r glmfit, echo = FALSE, warning=FALSE, fig.height=3.}
+
+sleep_int.fit = lmer(Reaction ~ Days + (Days|Subject), sleep.df)
+
+CI.lme.df = analyze(sleep_int.fit)$summary
+
+ggplot(CI.lme.df, aes(Variable)) +
+    geom_hline(yintercept = 0, alpha = .5)+
+    geom_pointrange(aes(y = Coef, ymin= CI_lower, ymax = CI_higher)) +
+    coord_flip() +
+    labs(x = "", y = expression(Coefficient~and~95^{th}~CI))
+
+```
+
+
+## A Common Challenge|Repeated measures 
+-- Multiple measures from the same person who might also be part of a group
+
+-- Multiple exposures across people to the same stimuli
+
+-- Repeated measures ANOVA accommodates correlated observations
+
+-- Multi-level general linear models go further and explicitly model grouping effects
+
+-- Addresses Simpson's paradox, where individual trends don't reflect the aggregate trend
+
+

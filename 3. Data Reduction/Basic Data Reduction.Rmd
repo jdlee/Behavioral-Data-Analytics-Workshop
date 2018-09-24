@@ -1,0 +1,279 @@
+---
+title: "Basic Data Reduction with dplyr"
+author: "John D. Lee and Linda Ng Boyle"
+date: 10/1/2018
+output:
+  ioslides_presentation:
+    widescreen: true
+
+---
+
+```{r setup, include=FALSE, warnings=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(cache = TRUE)
+
+library(tidyverse)
+library(skimr)
+library(broom)
+library(lme4) # For sleep data
+
+set.seed(1)
+rm(list = ls(all = TRUE))
+```
+
+-- 
+
+## Google Quantitative User Experience Research
+https://careers.google.com/jobs#!t=jo&jid=/google/quantitative-user-experience-researcher-google-building-41-1600-amphitheatre-1285660001&
+
+"Develop code and statistical models to understand user experience."
+
+"Experience in a programming language commonly used for data manipulation and computational statistics (such as Python, R, Matlab, C++, Java or Go), and with SQL."
+
+<br />
+<br />
+
+<span style="font-size:1.8em">
+``dplyr`` is a simple way to do SQL-type data manipulation
+</span>
+
+## dplyr for Data Reduction|dplyr as grammar of data reduction
+-- ``select`` to remove variables (i.e., columns)
+
+-- ``filter`` to subset the data and remove observations (i.e., rows)
+
+-- ``mutate`` to create new variables
+
+-- ``summarise`` to aggregate data across rows (i.e., mean of values)
+
+-- ``group_by`` to group variables for ``mutate`` and ``summarise``
+
+-- ``do`` to fit a model or create a plot each group of the data
+
+-- ``join`` to combine datasets 
+
+## Pipe (i.e., ``%>%``) for Combining Operations{.build}
+-- ``%>%`` acts as "and then" to chain operations
+
+-- ``sleep.df %>% summarise(mean(Reaction))`` ~ take sleep dataframe "and then" calculate mean of Reaction 
+
+-- More comprehensible than the equivalent: ``summarise(sleep.df, mean(Reaction))``
+
+-- Many operations can be chained with ``%>%`` to create data reduction "sentences"
+
+
+-- ``sleep.df %>% filter(Reaction>250) %>% group_by(Subject) %>% summarise(m.rt = mean(Reaction))``
+
+More understandable?
+
+-- ``summarise(group_by(filter(sleep.df, Reaction>250), Subject), mean(Reaction))``
+
+
+## ``select`` to Remove Variables{.smaller}
+
+```{r select, echo = TRUE, warning=FALSE, fig.height=4}
+sleep.df = sleepstudy
+
+head(sleep.df)
+
+nort.sleep.df = sleep.df %>% select(-Reaction)
+head(nort.sleep.df)
+
+```
+
+
+## ``filter`` to Identify Outliers
+```{r filter_extreme, echo = TRUE, warnings = FALSE}
+
+longrt_sleep.df = sleep.df %>% filter(Reaction>450)
+
+head(longrt_sleep.df)
+
+```
+
+
+## ``mutate`` to Create New Variables{.smaller}
+
+```{r mutate, echo = TRUE, warning=FALSE, fig.height=4}
+
+sleep.df = sleepstudy
+sleep.df = sleep.df %>% mutate(log.reaction = log(Reaction))
+
+ggplot(sleep.df, aes(Days, log.reaction)) +
+  geom_point()
+
+```
+
+
+## ``group_by`` to Group Data for ``mutate``|Adds z-score based on each Subject{.smaller} 
+
+```{r group_by_mutate, echo = TRUE, warnings=FALSE, fig.height=3.5}
+
+sleep.df = sleep.df %>% group_by(Subject) %>% 
+  mutate(z.reaction = scale(Reaction))
+
+ggplot(sleep.df, aes(Days, z.reaction)) +
+  geom_point()
+
+
+```
+
+
+## ``group_by`` to Group Data for ``summarise``|Aggregates data with summary statistics{.smaller}
+
+```{r group_by_summarise, echo = TRUE, warnings=FALSE, fig.height=3.5}
+
+s.sleep.df = sleep.df %>% group_by(Subject) %>% 
+  summarise(m.reaction = mean(Reaction), sd.reaction = sd(Reaction))
+
+ggplot(s.sleep.df, aes(reorder(Subject, m.reaction), m.reaction)) + 
+  geom_pointrange(aes(ymin = m.reaction-sd.reaction, ymax = m.reaction+sd.reaction)) 
+
+```
+
+## ``filter`` to Subset the Data|Add layer to highlight outliers{.smaller}
+```{r filter, echo = TRUE, warnings = FALSE, fig.height=3.5}
+
+r.s.sleep.df = s.sleep.df %>% filter(m.reaction>325)
+
+ggplot(s.sleep.df, aes(reorder(Subject, m.reaction), m.reaction)) + 
+  geom_pointrange(aes(ymin = m.reaction-sd.reaction, ymax = m.reaction+sd.reaction)) +
+  geom_point(data = r.s.sleep.df, size = 1, colour = "grey85")
+
+```
+
+
+## Exercise: Simple data aggregation|Calculate the mean and standard deviation of Reaction by day{.smaller}
+
+-- Group the data by ``Days`` and then summarise using ``mean`` and ``sd``
+
+-- Plot the summary data using ``geom_pointrange``
+
+-- Plot with 25^th^ and 75^th^ quantiles if this is too easy
+
+```{r meanbyday, echo = FALSE, warnings=FALSE, fig.height=3.5}
+
+s.sleep.df = sleep.df %>% group_by(Days) %>% 
+  summarise(m.rt = mean(Reaction), sd.rt = sd(Reaction))
+
+ggplot(s.sleep.df, aes(Days, y = m.rt, ymin = m.rt - sd.rt, ymax = m.rt + sd.rt)) +
+  geom_pointrange()
+
+```
+
+
+## ``do`` to Fit Model to Groups of Data|Fit regression model to each participant{.smaller}
+```{r facet_scatterplot_lm, echo = TRUE, warnings=FALSE, fig.height=3.25}
+
+models = sleep.df %>% group_by(Subject) %>% 
+  do(fit = lm(Reaction ~ Days, data = ., na.action = na.exclude)) 
+
+s.model = models %>% glance(fit) # Extracts summary of models
+
+ggplot(s.model, aes(reorder(Subject, r.squared), r.squared)) + geom_col() + coord_flip()
+
+```
+
+
+
+
+## ``join`` to Combine Datasets{.build} 
+
+**Mutating joins** add columns from x and y
+ 
+-- ``inner_join(x, y)``Returns all rows of x where there are matching values of y, all columns of x and y
+
+-- ``left_join(x, y)`` Returns all rows of x, all columns of x and y, rows of x with no match in y get NA
+
+-- ``full_join(x, y)`` Returns all rows and all columns of x and y, unmatched receive NA
+
+**Filtering joins** keep only columns from x
+ 
+-- ``semi_join(x, y)`` Return all row in x that have a matching values in y, columns of x
+
+-- ``anti_join(x, y)`` Return rows in x that are do NOT have a match in y, columns of x
+
+
+```{r vendiagram, echo = FALSE, warnings=FALSE}
+
+knitr::include_graphics("join-venn.png", dpi = 175)
+
+```
+
+From: R for Data Science (Grolemund, Wickham, 2017)
+
+
+## ``join`` to Combine Datasets{.smaller}
+```{r join_data, echo = TRUE, warnings=FALSE, fig.height=3.75, fig.width=10.25}
+a.model.df = models %>% augment(fit) # Extracts summary of models
+augmented.sleep.df = left_join(sleep.df, a.model.df, by = c("Subject", "Days", "Reaction"))
+
+ggplot(augmented.sleep.df, aes(Days, Reaction)) +
+  geom_point()+
+  geom_point(aes(Days, .fitted), shape = 21) +
+  facet_grid(.~Subject)
+  
+```
+
+
+## Pattern of Model Errors|Residuals highlight problems{.smaller}
+```{r residuals, echo = TRUE, warnings=FALSE, fig.height=3.75, fig.width=10.25}
+
+ggplot(augmented.sleep.df, aes(Days, .resid)) +
+  geom_point() +
+  geom_line(alpha =.6) +
+  facet_grid(.~Subject)
+  
+
+```
+
+## Exercise|Model and merge{.smaller} 
+
+-- Fit a regression model for each participant and extract the r.squared value with the ``glance`` function
+
+-- Summarize the sleep data by person to calculate the mean reaction time
+
+-- Merge the summarized data and the r.square value and plot
+
+```{r modelmerge, echo = FALSE, warnings=FALSE, fig.height=3.5}
+
+models = sleep.df %>% group_by(Subject) %>% 
+  do(fit = lm(Reaction ~ Days, data = ., na.action = na.exclude)) 
+
+s.model = models %>% glance(fit) # Extracts summary of models
+
+s.sleep.df = sleep.df %>% group_by(Subject) %>% summarise(m.rt = mean(Reaction))
+
+augmented.s.sleep.df = left_join(s.sleep.df, s.model, by = c("Subject"))
+
+ggplot(augmented.s.sleep.df, aes(m.rt, r.squared))+geom_point()
+
+```
+
+
+## dplyr for Data Reduction
+
+**dplyr as grammar of data reduction**
+
+-- ``select`` to remove variables (i.e., columns)
+
+-- ``filter`` to subset the data and remove observations (i.e., rows)
+
+-- ``mutate`` to create new variables
+
+-- ``summarise`` to aggregate data across rows (i.e., mean of values)
+
+-- ``group_by`` to group variables for "mutate" and "summarise"
+
+-- ``do`` to fit a model or create a plot each group of the data
+
+-- ``join`` to combine datasets
+
+**Pipe (i.e., ``%>%``) for combining operations in a comprehensible way**
+
+
+
+
+
+
+

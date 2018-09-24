@@ -1,0 +1,123 @@
+---
+title: "Survey of Machine Learning Methods and Resources"
+author: "John D. Lee and Linda Ng Boyle"
+date: 10/1/2018
+output:
+  ioslides_presentation:
+    widescreen: true
+---
+
+
+```{r setup, include=FALSE, warnings=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(cache = TRUE)
+
+library(tidyverse)
+library(skimr)
+library(lme4)
+
+set.seed(1)
+rm(list = ls(all = TRUE))
+```
+
+
+## Machine Learning Next Steps
+-- Machine learning challenges and opportunities
+
+-- Other machine learning techniques
+
+-- Machine learning resources
+
+
+## Machine Learning Challenges and Opportunities|Issues that behavioral scientists can help address
+
+-- Representative sampling
+
+-- Differential costs of prediction errors
+
+-- Tradeoff of model understandability and performance
+
+-- Explaining model output (LIME)
+
+-- Ethical considerations
+
+-- Design thinking and systems thinking
+
+
+
+## Machine Learning Techniques|Text analysis: Quantitative analysis of qualitative data 
+```{r, out.width="60%"}
+knitr::include_graphics("TopicNetwork.png")
+```
+
+
+## Machine learning resources: caret
+
+-- Comprehenvise online description of caret features (http://topepo.github.io/caret/index.html)
+
+-- Early draft of book on feature engineering by the author of caret (http://www.feat.engineering)
+
+```{r, out.width="30%"}
+knitr::include_graphics("caret_Applied_Predictive_Modeling.jpg")
+```
+
+
+## Machine Learning Resources: Keras 
+
+-- Simple interface to powerful deep learning algorithms
+
+-- Support for prototyping through deployment
+
+```{r, out.width="66%"}
+knitr::include_graphics("keras-logo.png")
+```
+ 
+https://keras.rstudio.com
+
+## Machine Learning Resources: Kaggle
+
+-- Data--over 10,000 datasets
+
+-- Competitions
+
+-- Kernels--code developed for analysis of datasets hosted on kaggle
+
+```{r, out.width="50%"}
+knitr::include_graphics("Kaggle.png")
+```
+
+https://www.kaggle.com
+
+
+
+## Machine Learning Resources: DataCamp
+
+-- Online courses with integrated exercises
+
+-- Including basic R and advanced courses 
+
+-- Machine learning toolbox by the author of caret
+
+-- Writing functions by author of the tidyverse
+
+```{r, out.width="40%"}
+knitr::include_graphics("DataCamp.jpg")
+```
+
+https://www.datacamp.com/courses/machine-learning-toolbox
+
+
+## Workshop Summary
+Human Factors contributions to ML and ML contributions to Human Factors
+
+-- Data visualization: Don't venture into uncharted territory
+
+-- Data reduction and cleaning: 80% of any data analysis
+
+-- Multi-level general linear models
+
+-- Machine learning overview and implementation
+
+-- Survey of machine learning behavioral issues and applications
+
+Repeatable data analysis with R and RStudio
