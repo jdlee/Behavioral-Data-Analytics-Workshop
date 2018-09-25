@@ -52,6 +52,7 @@ https://careers.google.com/jobs#!t=jo&jid=/google/quantitative-user-experience-r
 
 -- ``join`` to combine datasets 
 
+
 ## Pipe (i.e., ``%>%``) for Combining Operations{.build}
 -- ``%>%`` acts as "and then" to chain operations
 
@@ -131,6 +132,7 @@ ggplot(s.sleep.df, aes(reorder(Subject, m.reaction), m.reaction)) +
 
 ```
 
+
 ## ``filter`` to Subset the Data|Add layer to highlight outliers{.smaller}
 ```{r filter, echo = TRUE, warnings = FALSE, fig.height=3.5}
 
@@ -176,7 +178,6 @@ ggplot(s.model, aes(reorder(Subject, r.squared), r.squared)) + geom_col() + coor
 
 
 
-
 ## ``join`` to Combine Datasets{.build} 
 
 **Mutating joins** add columns from x and y
@@ -193,10 +194,10 @@ ggplot(s.model, aes(reorder(Subject, r.squared), r.squared)) + geom_col() + coor
 
 -- ``anti_join(x, y)`` Return rows in x that are do NOT have a match in y, columns of x
 
-
+## Joining data
 ```{r vendiagram, echo = FALSE, warnings=FALSE}
 
-knitr::include_graphics("join-venn.png", dpi = 175)
+knitr::include_graphics("join-venn.png", dpi = 125)
 
 ```
 
