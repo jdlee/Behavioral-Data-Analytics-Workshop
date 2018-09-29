@@ -1,10 +1,11 @@
 ---
 title: "Implementing Machine Learning"
 author: "John D. Lee and Linda Ng Boyle"
-date: 10/1/2018
+date: "10/1/2018"
 output:
   ioslides_presentation:
-    widescreen: true
+    widescreen: yes
+  beamer_presentation: default
 ---
 
 <style>
@@ -21,7 +22,8 @@ knitr::opts_chunk$set(cache = FALSE)
 
 library(tidyverse)
 library(skimr)
-library(lme4) # For the sleep study data
+library(lme4) # Foy
+#yr the sleep study data
 library(caret)
 library(kernlab)
 library(ipred)
@@ -33,7 +35,7 @@ library(pROC)
 library(plotROC)
 
 
-checkpoint("2018-09-21")
+checkpoint("2018-09-26")
 set.seed(42)
 rm(list = ls(all = TRUE))
 ```
@@ -104,6 +106,7 @@ featurePlot(x = wine.df[, 2:11], y = wine.df$quality,
             plot = "scatter",
             type = c("p", "smooth"), span = .5,
             layout = c(5, 2))
+
 ```
 
 
@@ -118,8 +121,20 @@ ggplot(quality.wine.df, aes(goodwine, quality, colour = goodwine, fill = goodwin
   labs(x = "Discretized wine quality", y = "Rated wine quality")+
   theme(legend.position = "none")
 
-
 wine.df = quality.wine.df %>% select(-quality)
+
+```
+
+
+## Holdout Validation
+```{r fitvalidation, echo = FALSE, warning=FALSE,fig.height=7}
+knitr::include_graphics("1.FittingValidation.png", dpi=120)
+```
+
+
+## Cross-validation: Repeated k-fold cross-validation
+```{r crossvalidation, echo = FALSE, warning=FALSE,fig.height=7}
+knitr::include_graphics("2. CrossvalidationRepeatedcrossvalidation.png", dpi=120)
 ```
 
 
@@ -216,7 +231,7 @@ ggarrange(raw.plot, scaled.plot,
 
 
 
-## Cross Validation
+## Cross-validation
 -- Used to select best combination of predictors and model parameters
 
 -- Estimates model performance (e.g., AUC or r-square) for each candidate model
@@ -228,8 +243,14 @@ ggarrange(raw.plot, scaled.plot,
 knitr::include_graphics("K-fold_cross_validation.jpg", dpi = 75)
 ```
 
-## Grouped Cross-validation|Sleep study example
 
+## Cross-validation: Hyperparameter tuning
+```{r tuning, echo = FALSE, warning=FALSE,fig.height=7}
+knitr::include_graphics("3.TrainTestTune.png", dpi=60)
+```
+
+
+## Grouped Cross-validation|Sleep study example
 ``sleep.df = sleepstudy``<br>
 ``folds <- groupKFold(sleep.df$Subject, k = 18)``
 
@@ -298,7 +319,6 @@ train.control = trainControl(method = "repeatedcv",
 ```
 
 
-
 ## Select Models to Train
 -- Over 200 different models from 50 categories (e.g., Linear regression, boosting, bagging, cost sensitive learning)
 
@@ -325,7 +345,7 @@ train.control = trainControl(method = "repeatedcv",
 -- Include the train control specified earlier
 
 
-## Train Models and Tune Hyperparameters: Logistic regression
+## Train Models and Tune Hyperparameters: <br>Logistic regression
 -- Logistic regression has no tuning parameters
 
 -- 10-fold repeated (3 times) cross-validation occurs once 
@@ -412,7 +432,6 @@ knitr::include_graphics("xgboost_residualfitting.png")
 **A grid search with 3 levels for each parameter produces 3^7 combinations!**
 
 
-
 ## Train Models and Tune Hyperparameters: xgboost
 
 ``tuneLength = 3`` produces 
@@ -441,6 +460,7 @@ xgb.fit = train(x = trainScaled, y = trainClass,
   tuneLength = 3, # Depends on number of parameters in algorithm
   trControl = train.control, scaled = TRUE)
 ```
+
 
 ## Train models and tune: xgboost
 ```{r, plot_train_xgb, echo=FALSE, cache=TRUE, warning=FALSE, message=FALSE, fig.height=4.5}
@@ -582,12 +602,10 @@ ggsave(filename = "predicted_wine.png", plot = predicted_wine.plot, width = 5, h
 ``plot(varImp(xgb.fit, scale = TRUE))``
 
 
-
 ## Addressing the Black Box Problem with Understandable Models {.smaller}
 ```{r, Understand, out.width="43%"}
   knitr::include_graphics("MatrixAlgebraCartoon.png")
 ```
-
 
 
 ## An Understandable Model|Fast and frugal decision trees
@@ -612,7 +630,7 @@ fft.fit = FFTrees(formula = goodwine~., data = train.wine.df, do.comp = FALSE)
 
 
 ## Understandable (fft) and Sophisticated (xgb) 
-```{r, compare_fft_xgb, warning=FALSE, echo=FALSE, out.width="95%"} 
+```{r, compare_fft_xgb, warning=FALSE, echo=FALSE, out.width="92.5%"} 
 
 fft.pred = predict(fft.fit, newdata =test.wine.df, type = "prob")
 fft.roc = roc(predictor = fft.pred[, 2], response = test.wine.df$goodwine,
@@ -627,7 +645,6 @@ xgb.roc.plot +
 ```
 
 
-
 ## Regression|Prediction of continuous variables{.columns-2}
 -- Similar process different performance metrics
 
@@ -640,17 +657,23 @@ xgb.roc.plot +
     - How to penalize the model for large deviations?
 
     - Does the sign of the error matter?
-
-    - Similar to the issue with classificaiton: Are misses and false alarms equally problematic?
+    
+    - How to define and ensure fair algorithms?
 <br />
 <br />
 -- Cost sensitive learning and optimal $\beta$
+  - Similar to the issue with classificaiton: Are misses and false alarms equally problematic?
     
 
 ```{r, out.width="45%"}
   knitr::include_graphics("CostSensitveML.jpg")
 ```
     
+    
+## Cross validation: Deploy and monitor
+```{r deploy, echo = FALSE, warning=FALSE,fig.height=7}
+knitr::include_graphics("4.DeployMonitor.png", dpi=120)
+```
 
 
 ##  Simplified Machine Learning Process

@@ -28,7 +28,7 @@ rm(list = ls(all = TRUE))
 
 -- ML mindset for data analysis might save us from the p-value ritual
 
--- ML and Human-centered tradeoffs in model development
+-- ML and Human-centered tradeoffs in model development (e.g., understanding and fairness)
 
 
 
@@ -48,10 +48,10 @@ knitr::include_graphics("Weapons_of_Math_Destruction.jpg")
 
 -- Sea-level and C-level support for success
 
-
 ```{r UCE, echo = FALSE, warning=FALSE}
 knitr::include_graphics("UCE.jpg", dpi = 210)
 ```
+
 
 
 ## Machine Learning versus <br> Inferential Data Analysis{.bigger}
@@ -63,6 +63,14 @@ ML mindset| Traditional inferential mindset
 Prediction|Inference
 Cross validation and prediction error|Hypothesis testing and p values
 Practical significance|Statistical significance
+
+
+
+## Holdout validation and prediction error
+
+```{r fitvalidation, echo = FALSE, warning=FALSE,fig.height=7}
+knitr::include_graphics("1.FittingValidation.png", dpi=120)
+```
 
 
 
@@ -81,10 +89,12 @@ https://www.ibm.com/developerworks/library/cc-models-machine-learning/index.html
 </span>
 
 
+
 ## Supervised Learning: More than curve fitting?
 ```{r curvefitting, echo = FALSE, warning=FALSE}
 knitr::include_graphics("curve_fitting_cartoon.png", dpi = 175)
 ```
+
 
 
 ## Essential Tradeoffs in ML Design|Variance-bias tradeoff of a model $\theta${.smaller}
@@ -115,12 +125,18 @@ $L(\theta) =  \sum_{i=1}^n (y_i-\hat{y_i})^2$ Positive errors equally problemati
 $\Omega(\theta)$ Model complexity does not typically reflect perceived complexity 
 
 
+
 ## Essential Tradeoffs in ML Design| Hyperparameters
 
--- Hyperparameters are parameters of the ML algorithms that govern how they fit the data
--- Some hyperparameters allow a better model fit
--- Some hyperparameters allow a more robust model
--- Some hyperparameters allow for a more understandable model
+Hyperparameters govern how ML algorithms fit the data and promote:
+
+-- a better model fit
+
+-- a more robust model
+
+-- a more understandable model
+
+
 
 ## HF Considerations for ML and <br> ML Considerations for HF
 -- Human-centered ML represents a looming societal need
