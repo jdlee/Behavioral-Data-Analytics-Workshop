@@ -102,17 +102,32 @@ knitr::include_graphics("caret_Applied_Predictive_Modeling.jpg")
 ```
 
 
-## Machine Learning Resources: Keras 
+## Machine Learning Resources: Keras  {.columns-2}
 
 -- Simple interface to powerful deep learning algorithms
 
 -- Support for prototyping through deployment
 
-```{r, out.width="66%"}
+-- Implement and deply in an afternoon
+<br>
+<br>
+<br>
+<br>
+
+
+```{r, out.width="50%"}
 knitr::include_graphics("keras-logo.png")
 ```
  
 https://keras.rstudio.com
+
+<p class="forceBreak"></p>
+
+```{r, out.width="38%"}
+knitr::include_graphics("keras_start.png")
+```
+
+
 
 ## Machine Learning Resources: Kaggle
 
