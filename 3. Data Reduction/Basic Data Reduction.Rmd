@@ -1,7 +1,7 @@
 ---
 title: "Basic Data Reduction with dplyr"
 author: "John D. Lee and Linda Ng Boyle"
-date: 10/1/2018
+date: 10/28/2019
 output:
   ioslides_presentation:
     widescreen: true
@@ -205,7 +205,9 @@ From: R for Data Science (Grolemund, Wickham, 2017)
 
 
 ## ``join`` to Combine Datasets{.smaller}
+``broom'' for extracting model parameters and predictions
 ```{r join_data, echo = TRUE, warnings=FALSE, fig.height=3.75, fig.width=10.25}
+library(broom)
 a.model.df = models %>% augment(fit) # Extracts summary of models
 augmented.sleep.df = left_join(sleep.df, a.model.df, by = c("Subject", "Days", "Reaction"))
 

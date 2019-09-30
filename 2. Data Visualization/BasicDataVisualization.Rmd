@@ -1,15 +1,17 @@
 ---
 title: "Basic Data Visualization with ggplot2"
 author: "John D. Lee and Linda Ng Boyle"
-date: 10/1/2018
+date: 10/28/2019
 output:
   ioslides_presentation:
     widescreen: yes
   beamer_presentation: default
+
 ---
 
 <style>
 .forceBreak { -webkit-column-break-after: always; break-after: column; column-width: 500px }
+
 </style>
 
 ```{r setup, include=FALSE, warnings=FALSE}
@@ -112,11 +114,11 @@ ggplot(sleep.df, aes(Days, Reaction, group = Subject)) +
 --Replicate what we just showed in an R notebook
 -- Create a Notebook: File>>New file>> R Notebook
 
--- Load the lme, skimr, and ggplot2 packages
+-- Load the lmer, skimr, and tidyverse packages
 
 -- Create the dataframe ``sleep.df`` by setting it equal to ``sleepstudy``
 
--- Use skimr to summarize the data
+-- Use ``skimr`` to summarize the data
 
 -- Use ggplot2 to create simple scatterplot of reaction time and day, and set the color to ``darkred``
 
@@ -193,7 +195,7 @@ ggplot(sleep.df, aes(Days, Reaction)) +
 <p class="forceBreak"></p>
 ```{r facetedtimeseries, echo = FALSE, warning=FALSE}
 
-include_graphics("edrplot.png", dpi = 125)
+knitr::include_graphics("edrplot.png", dpi = 125)
 
 ```
 

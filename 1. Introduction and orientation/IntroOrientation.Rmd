@@ -1,7 +1,7 @@
 ---
 title: "Introductions and Orientation to the Workshop"
 author: "John D. Lee and Linda Ng Boyle"
-date: “10/1/2018"
+date: 10/28/2019
 output:
   ioslides_presentation:
     widescreen: yes
@@ -39,7 +39,7 @@ Rule 1: For Every Result, Keep Track of How It Was Produced (Run script in R)
 
 Rule 2: Avoid Manual Data Manipulation Steps (Run script in R)
 
-Rule 3: Archive the Exact Versions of All External Programs Used (Run checkpoint)
+Rule 3: Archive the Exact Versions of All External Programs Used (Run checkpoint())
 
 Rule 4: Version Control All Scripts (Use GitHub through RStudio)
 
@@ -58,7 +58,7 @@ Rule 10: Provide Public Access to Scripts, Runs, and Results (Use GitHub through
 ---
 
 ```{r typesofML, echo = FALSE, warning=FALSE}
-knitr::include_graphics("PhDComicsVersionControl.png", dpi = 130)
+knitr::include_graphics("PhDComicsVersionControl.png", dpi = 120)
 ```
 
 
@@ -71,7 +71,7 @@ knitr::include_graphics("PhDComicsVersionControl.png", dpi = 130)
 -- Objectives in taking the workshop
 
 ## Workshop Overview
--- Data visualization: Don't venture into uncharted territory
+-- Data visualization: Don't analyze in uncharted territory
 
 -- Data reduction and cleaning: 80% of any data analysis
 
