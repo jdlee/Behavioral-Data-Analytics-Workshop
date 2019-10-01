@@ -89,7 +89,7 @@ knitr::include_graphics("PhDComicsVersionControl.png", dpi = 120)
 <br />
 <br />
 
--- Multi-level general linear models: <br /> Not just accommodating correlated responses with repeated measures experimental designs
+-- Multi-level general linear models: <br /> Not just accommodating correlated responses with repeated measures designs
 
 -- Machine learning overview and implementation
 
