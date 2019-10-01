@@ -205,11 +205,11 @@ From: R for Data Science (Grolemund, Wickham, 2017)
 
 
 ## ``join`` to Combine Datasets{.smaller}
-``broom'' for extracting model parameters and predictions
-```{r join_data, echo = TRUE, warnings=FALSE, fig.height=3.75, fig.width=10.25}
+use "broom" to extract model parameters and predictions
+```{r join_data, echo = TRUE, warnings=FALSE, fig.height=3.2, fig.width=10.25}
 library(broom)
-a.model.df = models %>% augment(fit) # Extracts summary of models
-augmented.sleep.df = left_join(sleep.df, a.model.df, by = c("Subject", "Days", "Reaction"))
+sum.model.df = models %>% augment(fit) # Extracts summary of models
+augmented.sleep.df = left_join(sleep.df, sum.model.df, by = c("Subject", "Days", "Reaction"))
 
 ggplot(augmented.sleep.df, aes(Days, Reaction)) +
   geom_point()+
