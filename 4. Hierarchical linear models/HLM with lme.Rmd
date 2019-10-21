@@ -27,6 +27,7 @@ library(skimr)
 library(lme4)
 library(lmerTest)
 library(psycho)
+library(scales)
 set.seed(1)
 rm(list = ls(all = TRUE))
 ```
@@ -45,8 +46,7 @@ rm(list = ls(all = TRUE))
 
 
 ## Simpson's Paradox
-```{r simpons_pardox, echo = FALSE, warnings=FALSE, fig.height=5.25, fig.width=6.5, echo=FALSE}
-library(scales)
+```{r simpons_pardox, echo = FALSE, warnings=FALSE, fig.height=4.75, fig.width=6., echo=FALSE}
 set.seed(123)
 n = 1000
 
@@ -123,7 +123,7 @@ ggplot(sleep.df, aes(Days, Reaction)) +
 
 
 ## Random Effect for Intercept
-```{r lmer_int, echo = TRUE, warnings=FALSE, fig.height=4, fig.width=10.25,prediction}
+```{r lmer_int, echo = TRUE, warnings=FALSE, fig.height=4, fig.width=10.25}
 sleep_int.fit = lmer(Reaction ~ Days + (1|Subject), sleep.df)
 summary(sleep_int.fit)
 
