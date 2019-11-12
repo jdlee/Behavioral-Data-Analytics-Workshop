@@ -1,7 +1,11 @@
 ---
 title: "Survey of Machine Learning Methods and Resources"
 author: "John D. Lee and Linda Ng Boyle"
+<<<<<<< HEAD
 date: "10/28/2019"
+=======
+date: 10/28/2019
+>>>>>>> e9bfc72ed948b82244b1b3f3849daf1e004c2482
 output:
   ioslides_presentation:
     widescreen: yes

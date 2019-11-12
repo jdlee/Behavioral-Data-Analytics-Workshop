@@ -1,0 +1,437 @@
+install.packages("rmarkdown")
+install.packages("tidyverse")
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(cache = TRUE)
+#### Use caret to develop, tune and validate a range of data mining models ####
+# http://www.jstatsoft.org/v28/i05/paper
+library(tidyverse)
+library(skimr)
+library(caret)
+library(kernlab)
+library(ipred)
+## Possible data sets
+# https://archive.ics.uci.edu/ml/datasets/Wine+Quality
+# https://archive.ics.uci.edu/ml/datasets/Breast+Cancer+Wisconsin+%28Diagnostic%29
+# https://archive.ics.uci.edu/ml/datasets/Challenger+USA+Space+Shuttle+O-Ring
+# https://archive.ics.uci.edu/ml/datasets/Teaching+Assistant+Evaluation
+# Many other data sets and many other resources for machine learning: kaggle.com
+set.seed(888)
+rm(list = ls(all = TRUE))
+plot(svm.fit)
+grid = expand.grid(C= c(05, .1, .2, .5, 1, 2))
+svm.fit =  train(trainScaled, trainClass,
+method = "svmLinear", metric = "ROC",
+tuneGrid = grid,
+tuneLength = 2, # Depends on number of parameters in algorithm
+trControl = train.control, scaled = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(cache = TRUE)
+#### Use caret to develop, tune and validate a range of data mining models ####
+# http://www.jstatsoft.org/v28/i05/paper
+library(tidyverse)
+library(skimr)
+library(caret)
+library(kernlab)
+library(ipred)
+## Possible data sets
+# https://archive.ics.uci.edu/ml/datasets/Wine+Quality
+# https://archive.ics.uci.edu/ml/datasets/Breast+Cancer+Wisconsin+%28Diagnostic%29
+# https://archive.ics.uci.edu/ml/datasets/Challenger+USA+Space+Shuttle+O-Ring
+# https://archive.ics.uci.edu/ml/datasets/Teaching+Assistant+Evaluation
+# Many other data sets and many other resources for machine learning: kaggle.com
+set.seed(888)
+rm(list = ls(all = TRUE))
+# cancer.df = read_csv("/Users/jdlee/Google Drive/ _Projects/HFES Behavioral Data Analytics/6. Implementing ML /wbc.csv")
+# skim(cancer.df)
+# cancer.df = cancer.df %>% select(-X33)
+wine.df =  read_csv("/Users/jdlee/Google Drive/ _Projects/HFES Behavioral Data Analytics/6. Implementing ML /winequality-red.csv")
+skim(wine.df)
+#### Create random split of data for training and testing ####
+# The function creates the random splits within each
+# class so that the overall class distribution is preserved as well as possible."
+wine.df = wine.df %>% mutate(goodwine = if_else(quality>5, "good", "bad")) %>%
+select(-quality) %>% mutate(goodwine = as.factor(goodwine))
+inTrain <- createDataPartition(wine.df$goodwine, p = 3/4, list = FALSE)
+trainDescr <- wine.df[inTrain, -12] # All but class variable
+testDescr <- wine.df[-inTrain, -12]
+trainClass <- wine.df$goodwine[inTrain]
+testClass <- wine.df$goodwine[-inTrain]
+prop.table(table(wine.df$goodwine))
+prop.table(table(trainClass)) # Should match overall data probabilities closely
+#### Identify any highly correlated or near zero variance predictors ####
+## Eliminates all if no variables are problematic: TODO write if then to avoid
+## TODO no high correlation removes all variables
+# ncol(trainDescr)
+# descrCorr <- cor(trainDescr)
+# highCorr <- findCorrelation(descrCorr, 0.90)
+# highCorr
+# trainDescr <- trainDescr[, -highCorr]
+# testDescr <- testDescr[, -highCorr]
+# ncol(trainDescr)
+#
+#  nearZeroVar(trainDescr, saveMetrics = TRUE)
+#  nzv = nearZeroVar(trainDescr, freqCut = 95/5, uniqueCut = 10, saveMetrics = FALSE)
+#  nzv
+#  trainDescr <- trainDescr[, -nzv]
+#  testDescr <- testDescr[, -nzv]
+#  ncol(trainDescr)
+#### Identify any highly correlated or near zero variance predictors ####
+## Eliminates all if no variables are problematic: TODO write if then to avoid
+## TODO no high correlation removes all variables
+ncol(trainDescr)
+descrCorr <- cor(trainDescr)
+highCorr <- findCorrelation(descrCorr, 0.90)
+highCorr <- findCorrelation(descrCorr, 0.70)
+highCorr <- findCorrelation(descrCorr, 0.50)
+highCorr
+trainDescr <- trainDescr[, -highCorr]
+testDescr <- testDescr[, -highCorr]
+ncol(trainDescr)
+nearZeroVar(trainDescr, saveMetrics = TRUE)
+nzv = nearZeroVar(trainDescr, freqCut = 95/5, uniqueCut = 10, saveMetrics = FALSE)
+nzv
+trainDescr[, -nzv]
+trainDescr[, -nzv]
+trainDescr <-
+temp =  trainDescr[, -nzv]
+temp =  trainDescr[, -nzv]
+nearZeroVar(trainDescr, freqCut = 95/5, uniqueCut = 10, saveMetrics = FALSE)
+wine.df =  read_csv("/Users/jdlee/Google Drive/ _Projects/HFES Behavioral Data Analytics/6. Implementing ML /winequality-red.csv")
+skim(wine.df)
+wine.df =  read_csv("/Users/jdlee/Google Drive/ _Projects/HFES Behavioral Data Analytics/6. Implementing ML /winequality-red.csv")
+skim(wine.df)
+featurePlot(x = wine[, 1:11],
+y = wine$quality,
+plot = "scatter",
+type = c("p", "smooth"),
+span = .5,
+layout = c(3, 1))
+featurePlot(x = wine.df[, 1:11],
+y = wine.df$quality,
+plot = "scatter",
+type = c("p", "smooth"),
+span = .5,
+layout = c(3, 1))
+wine.df =  read_csv("/Users/jdlee/Google Drive/ _Projects/HFES Behavioral Data Analytics/6. Implementing ML /winequality-red.csv")
+skim(wine.df)
+featurePlot(x = wine.df[, 1:11],
+y = wine.df$quality,
+plot = "scatter",
+type = c("p", "smooth"),
+span = .5,
+layout = c(5, 2))
+featurePlot(x = wine.df[, 2:11],
+y = wine.df$quality,
+plot = "scatter",
+type = c("p", "smooth"),
+span = .5,
+layout = c(5, 2))
+wine.df =  read_csv("/Users/jdlee/Google Drive/ _Projects/HFES Behavioral Data Analytics/6. Implementing ML /winequality-red.csv")
+skim(wine.df)
+featurePlot(x = wine.df[, 2:11],
+y = wine.df$quality,
+plot = "scatter",
+type = c("p", "smooth"),
+span = .5,
+layout = c(5, 2))
+wine.df =  read_csv("/Users/jdlee/Google Drive/ _Projects/HFES Behavioral Data Analytics/6. Implementing ML /winequality-red.csv")
+skim(wine.df)
+quality.wine.df = wine.df %>% mutate(goodwine = if_else(quality>5, "good", "bad")) %>%
+mutate(goodwine = as.factor(goodwine))
+ggplot(quality.wine.df, aes(quality, alcohol, colour = goodwine))+
+geom_point()
+ggplot(quality.wine.df, aes(quality, alcohol, colour = goodwine))+
+geom_jitter()
+ggplot(quality.wine.df, aes(quality, alcohol, colour = goodwine))+
+geom_point()
+wine.df = quality.wine.df %>% select(-quality)
+prop.table(table(wine.df$goodwine))
+prop.table(table(trainClass)) # Should match overall data probabilities closely
+prop.table(table(testClass))
+prop.table(table(wine.df$goodwine)) %>% round(2)*100
+prop.table(table(trainClass))  %>% round(2)*100
+prop.table(table(testClass))  %>% round(2)*100
+wine.df =  read_csv("/Users/jdlee/Google Drive/ _Projects/HFES Behavioral Data Analytics/6. Implementing ML /winequality-red.csv")
+skim(wine.df)
+featurePlot(x = wine.df[, 2:11],
+y = wine.df$quality,
+plot = "scatter",
+type = c("p", "smooth"),
+span = .5,
+layout = c(5, 2))
+quality.wine.df = wine.df %>% mutate(goodwine = if_else(quality>5, "good", "bad")) %>%
+mutate(goodwine = as.factor(goodwine))
+ggplot(quality.wine.df, aes(quality, alcohol, colour = goodwine))+
+geom_point()
+wine.df = quality.wine.df %>% select(-quality)
+#### Create random split of data for training and testing ####
+# The function creates the random splits within each
+# class so that the overall class distribution is preserved as well as possible."
+wine.df = wine.df %>% mutate(goodwine = if_else(quality>5, "good", "bad")) %>%
+select(-quality) %>% mutate(goodwine = as.factor(goodwine))
+#### Create random split of data for training and testing ####
+# The function creates the random splits within each
+# class so that the overall class distribution is preserved as well as possible."
+inTrain <- createDataPartition(wine.df$goodwine, p = 3/4, list = FALSE)
+trainDescr <- wine.df[inTrain, -12] # All but class variable
+testDescr <- wine.df[-inTrain, -12]
+trainClass <- wine.df$goodwine[inTrain]
+testClass <- wine.df$goodwine[-inTrain]
+# Should match overall data probabilities closely
+prop.table(table(wine.df$goodwine)) %>% round(2)*100
+prop.table(table(trainClass))  %>% round(2)*100
+prop.table(table(testClass))  %>% round(2)*100
+inTrain <- createDataPartition(wine.df$goodwine, p = 3/4, list = FALSE)
+trainDescr <- wine.df[inTrain, -12] # All but class variable
+testDescr <- wine.df[-inTrain, -12]
+trainClass <- wine.df$goodwine[inTrain]
+testClass <- wine.df$goodwine[-inTrain]
+prop.table(table(wine.df$goodwine)) %>% round(2)*100
+prop.table(table(trainClass))  %>% round(2)*100
+prop.table(table(testClass))  %>% round(2)*100
+inTrain <- createDataPartition(wine.df$goodwine, p = 3/4, list = FALSE)
+trainDescr <- wine.df[inTrain, -12] # All but class variable
+testDescr <- wine.df[-inTrain, -12]
+trainClass <- wine.df$goodwine[inTrain]
+testClass <- wine.df$goodwine[-inTrain]
+prop.table(table(wine.df$goodwine)) %>% round(2)*100
+prop.table(table(trainClass))  %>% round(2)*100
+prop.table(table(testClass))  %>% round(2)*100
+ggplot(trainDescr, aes(alcohol))+geom_histogram()
+ggplot(trainScaled, aes(alcohol))+geom_histogram()
+xTrans = preProcess(trainDescr, method = c("center", "scale"))
+trainScaled = as.data.frame(predict(xTrans, trainDescr))
+testScaled = as.data.frame(predict(xTrans, testDescr))
+ggplot(trainDescr, aes(alcohol))+geom_histogram()
+ggplot(trainScaled, aes(alcohol))+geom_histogram()
+quality.wine.df = wine.df %>% mutate(goodwine = if_else(quality>5, "good", "bad")) %>%
+mutate(goodwine = as.factor(goodwine))
+wine.df =  read_csv("/Users/jdlee/Google Drive/ _Projects/HFES Behavioral Data Analytics/6. Implementing ML /winequality-red.csv")
+skim(wine.df)
+quality.wine.df = wine.df %>% mutate(goodwine = if_else(quality>5, "good", "bad")) %>%
+mutate(goodwine = as.factor(goodwine))
+ggplot(quality.wine.df, aes(alcohol, quality, colour = goodwine))+
+geom_point()
+wine.df = quality.wine.df %>% select(-quality)
+quality.wine.df = wine.df %>% mutate(goodwine = if_else(quality>5, "good", "bad")) %>%
+mutate(goodwine = as.factor(goodwine))
+ggplot(quality.wine.df, aes(alcohol, quality, colour = goodwine))+
+geom_point(size = .2, alpha = .3)+
+geom_violin()
+ggplot(quality.wine.df, aes(alcohol, quality, colour = goodwine, fill = goodwine))+
+geom_violin(alpha = .5)
+geom_point(size = .5, alpha = .3)
+quality.wine.df = wine.df %>% mutate(goodwine = if_else(quality>5, "good", "bad")) %>%
+mutate(goodwine = as.factor(goodwine))
+ggplot(quality.wine.df, aes(alcohol, quality, colour = goodwine, fill = goodwine))+
+geom_violin(alpha = .3)
+geom_point(size = .75, alpha = .9)
+ggplot(quality.wine.df, aes(alcohol, quality, colour = goodwine, fill = goodwine))+
+geom_violin(alpha = .3) +
+geom_point(size = .75, alpha = .9)
+par(mfrow=c(3,1))
+plot(varImp(glm.fit, scale = TRUE))
+grid = expand.grid(C = c(05, .1, .2, .5, 1, 2))
+svm.fit =  train(trainScaled, trainClass,
+method = "svmLinear", metric = "ROC",
+tuneGrid = grid,
+tuneLength = 2, # Number of levels of each algorithm parameter overridden by the grid
+trControl = train.control, scaled = TRUE)
+train.control <- trainControl(method = "repeatedcv",
+number = 10, repeats = 3, # number: number of folds
+search = "grid", # for tuning hyperparameters
+classProbs = TRUE,
+savePredictions = "final",
+summaryFunction = twoClassSummary)
+grid = expand.grid(C = c(05, .1, .2, .5, 1, 2))
+svm.fit =  train(trainScaled, trainClass,
+method = "svmLinear", metric = "ROC",
+tuneGrid = grid,
+tuneLength = 2, # Number of levels of each algorithm parameter overridden by the grid
+trControl = train.control, scaled = TRUE)
+plot(svm.fit)
+grid = expand.grid(C = c(05, .1, .2, .5, 1, 2))
+svm.fit =  train(trainScaled, trainClass,
+method = "svmLinear", metric = "ROC",
+tuneGrid = grid,
+tuneLength = 2, # Number of levels of each algorithm parameter overridden by the grid
+trControl = train.control, scaled = TRUE)
+plot(svm.fit)
+xgb.fit <- train(trainScaled, trainClass,
+method = "xgbTree", metric = "ROC",
+tuneLength = 3, # Depends on number of parameters in algorithm
+trControl = train.control, scaled = TRUE)
+plot(xgb.fit)
+plot(xgb.fit)
+test = xgb.fit$results
+View(test)
+plot(xgb.fit)
+grid = expand.grid(C = c(05, .1, .2, .5, 1, 2))
+svm.fit =  train(trainScaled, trainClass,
+method = "svmLinear", metric = "ROC",
+tuneGrid = grid,
+tuneLength = 2, # Number of levels of each algorithm parameter overridden by the grid
+trControl = train.control, scaled = TRUE)
+wine.df =  read_csv("/winequality-red.csv")
+wine.df =  read_csv("winequality-red.csv")
+skim(wine.df)
+wine.df =  read_csv("winequality-red.csv")
+skim(wine.df)
+wine.df =  read_csv("winequality-red.csv")
+skim(wine.df) %>% kable()
+ggplot(quality.wine.df, aes(alcohol, quality, colour = goodwine, fill = goodwine))+
+geom_point(size = .75, alpha = .9, position = position_jitter(width = 0.1, height = 0.1))
+ggplot(quality.wine.df, aes(alcohol, quality, colour = goodwine, fill = goodwine))+
+geom_point(size = .75, alpha = .7, position = position_jitter(height = 0.1))
+ggplot(quality.wine.df, aes(alcohol, quality, colour = goodwine, fill = goodwine))+
+geom_point(size = .5, alpha = .7, position = position_jitter(height = 0.1))
+quality.wine.df = wine.df %>% mutate(goodwine = if_else(quality>5, "good", "bad")) %>%
+mutate(goodwine = as.factor(goodwine))
+ggplot(quality.wine.df, aes(alcohol, quality, colour = goodwine, fill = goodwine))+
+geom_point(size = .5, alpha = .7, position = position_jitter(height = 0.1))
+wine.df = quality.wine.df %>% select(-quality)
+ggplot(trainDescr, aes(alcohol))+geom_histogram()
+ggplot(trainScaled, aes(alcohol))+geom_histogram()
+raw.plot = ggplot(trainDescr, aes(alcohol))+geom_histogram()
+scaled.plot = ggplot(trainScaled, aes(alcohol))+geom_histogram()
+ggarrange(raw.plot, scaled.plot,
+labels = c("Serial", "Parallel"),
+nrow=2, ncol = 1, align = "hv")
+library(ggpubr)
+xTrans = preProcess(trainDescr, method = c("center", "scale"))
+trainScaled = as.data.frame(predict(xTrans, trainDescr))
+testScaled = as.data.frame(predict(xTrans, testDescr))
+ggplot(trainDescr, aes(alcohol))+geom_histogram()
+ggplot(trainScaled, aes(alcohol))+geom_histogram()
+raw.plot = ggplot(trainDescr, aes(alcohol))+geom_histogram()
+scaled.plot = ggplot(trainScaled, aes(alcohol))+geom_histogram()
+ggarrange(raw.plot, scaled.plot,
+labels = c("Serial", "Parallel"),
+nrow=2, ncol = 1, align = "hv")
+#parallelplot(mod.resamps, metric = "ROC")
+# xyplot(mod.resamps, what = "BlandAltman")
+bwplot(mod.resamps, metric="ROC")
+mod.resamps = resamples(list(glm = glm.fit, svm = svm.fit, xgb = xgb.fit))
+mod.resamps = resamples(list(glm = glm.fit, svm = svm.fit, xgb = xgb.fit))
+raw.plot = ggplot(trainDescr, aes(alcohol))+geom_histogram()
+scaled.plot = ggplot(trainScaled, aes(alcohol))+geom_histogram()
+ggarrange(raw.plot, scaled.plot,
+labels = c("Original", "Normalized"),
+nrow=2, ncol = 1, align = "hv")
+raw.plot = ggplot(trainDescr, aes(alcohol))+geom_histogram()
+scaled.plot = ggplot(trainScaled, aes(alcohol))+geom_histogram()
+ggarrange(raw.plot, scaled.plot,
+labels = c("Original", "Normalized"),
+nrow=2, ncol = 1, align = "h")
+raw.plot = ggplot(trainDescr, aes(alcohol))+geom_histogram()
+scaled.plot = ggplot(trainScaled, aes(alcohol))+geom_histogram()
+ggarrange(raw.plot, scaled.plot,
+labels = c("Original", "Normalized"),
+nrow=2, ncol = 1, align = "v")
+xTrans = preProcess(trainDescr, method = c("center", "scale"))
+raw.plot = ggplot(trainDescr, aes(alcohol))+geom_histogram()
+scaled.plot = ggplot(trainScaled, aes(alcohol))+geom_histogram()
+ggarrange(raw.plot, scaled.plot,
+labels = c("Original", "Normalized"),
+nrow=2, ncol = 1, align = "v")
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(cache = TRUE)
+library(tidyverse)
+library(skimr)
+library(lme4)
+set.seed(1)
+rm(list = ls(all = TRUE))
+setwd("~/Google Drive/ _Projects/HFES Behavioral Data Analytics/1. Introduction and orientation")
+library(skimr)
+library(tidyverse)
+library(ggforce)
+library(lme4)
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(cache = TRUE)
+library(skimr)
+library(tidyverse)
+library(ggforce)
+library(lme4)
+set.seed(1)
+rm(list = ls(all = TRUE))
+library(skimr)
+library(lme4) # For the sleep study data
+sleep.df = sleepstudy
+skim(sleep.df)
+library(ggplot2)
+ggplot(data = sleep.df, mapping = aes(x = Days, y = Reaction)) +
+geom_point()
+ggplot(data = sleep.df, mapping = aes(x = Days, y = Reaction)) +
+geom_point(colour = "darkblue")
+ggplot(data = sleep.df, mapping = aes(x = as.factor(Days), y = Reaction)) +
+geom_violin(fill= "grey85", colour = "grey85") +
+geom_sina(colour = "darkblue", size = .7)
+ggplot(sleep.df, aes(Days, Reaction, group = Subject)) +
+geom_line(alpha = .33) +
+geom_smooth(method = "lm", se = FALSE, size = .8)
+## What happens when you don't identify the groups?
+# ggplot(sleep.df, aes(Days, Reaction)) +
+#   geom_point() +
+#   geom_smooth(method = "lm", se = FALSE)
+ggplot(data = sleep.df, mapping = aes(x = Days, y = Reaction)) +
+geom_point() +
+facet_grid(.~Subject)
+ggplot(sleep.df, aes(Days, Reaction)) +
+geom_point() +
+geom_smooth(method = "loess") +
+facet_grid(.~Subject)
+ggplot(sleep.df, aes(Days, Reaction)) +
+geom_point() +
+geom_smooth(method = "lm") +
+facet_grid(.~Subject)
+sleep.df = sleep.df %>%  mutate(Subject = reorder(Subject, Reaction, mean))
+ggplot(sleep.df, aes(Days, Reaction)) +
+geom_point() +
+geom_smooth(method = "lm") +
+facet_grid(.~Subject)
+include_graphics("edrplot.png", dpi = 125)
+knitr::include_graphics("edrplot.png", dpi = 125)
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(cache = TRUE)
+library(skimr)
+library(tidyverse)
+library(ggforce)
+library(lme4)
+set.seed(1)
+rm(list = ls(all = TRUE))
+library(skimr)
+library(lme4) # For the sleep study data
+sleep.df = sleepstudy
+skim(sleep.df)
+library(ggplot2)
+ggplot(data = sleep.df, mapping = aes(x = Days, y = Reaction)) +
+geom_point()
+ggplot(data = sleep.df, mapping = aes(x = Days, y = Reaction)) +
+geom_point(colour = "darkblue")
+ggplot(data = sleep.df, mapping = aes(x = as.factor(Days), y = Reaction)) +
+geom_violin(fill= "grey85", colour = "grey85") +
+geom_sina(colour = "darkblue", size = .7)
+ggplot(sleep.df, aes(Days, Reaction, group = Subject)) +
+geom_line(alpha = .33) +
+geom_smooth(method = "lm", se = FALSE, size = .8)
+## What happens when you don't identify the groups?
+# ggplot(sleep.df, aes(Days, Reaction)) +
+#   geom_point() +
+#   geom_smooth(method = "lm", se = FALSE)
+ggplot(data = sleep.df, mapping = aes(x = Days, y = Reaction)) +
+geom_point() +
+facet_grid(.~Subject)
+ggplot(sleep.df, aes(Days, Reaction)) +
+geom_point() +
+geom_smooth(method = "loess") +
+facet_grid(.~Subject)
+ggplot(sleep.df, aes(Days, Reaction)) +
+geom_point() +
+geom_smooth(method = "lm") +
+facet_grid(.~Subject)
+sleep.df = sleep.df %>%  mutate(Subject = reorder(Subject, Reaction, mean))
+ggplot(sleep.df, aes(Days, Reaction)) +
+geom_point() +
+geom_smooth(method = "lm") +
+facet_grid(.~Subject)
+knitr::include_graphics("edrplot.png", dpi = 125)

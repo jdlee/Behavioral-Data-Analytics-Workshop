@@ -1,7 +1,11 @@
 ---
 title: "Basic Data Reduction with dplyr"
 author: "John D. Lee and Linda Ng Boyle"
+<<<<<<< HEAD
 date: "10/28/2019"
+=======
+date: 10/28/2019
+>>>>>>> e9bfc72ed948b82244b1b3f3849daf1e004c2482
 output:
   ioslides_presentation:
     widescreen: yes
@@ -204,7 +208,11 @@ From: R for Data Science (Grolemund, Wickham, 2017)
 
 
 ## ``join`` to Combine Datasets{.smaller}
+<<<<<<< HEAD
 Use "broom" to extract model predictions and diagnostics
+=======
+use "broom" to extract model parameters and predictions
+>>>>>>> e9bfc72ed948b82244b1b3f3849daf1e004c2482
 ```{r join_data, echo = TRUE, warnings=FALSE, fig.height=3.2, fig.width=10.25}
 library(broom)
 sum.model.df = models %>% augment(fit) # Extracts summary of models

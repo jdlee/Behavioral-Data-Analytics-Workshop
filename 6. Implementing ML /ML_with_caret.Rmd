@@ -76,8 +76,11 @@ http://topepo.github.io/caret/index.html
 
 
 ##  Simplified Machine Learning Process{.build}
+<<<<<<< HEAD
 
 <b> -- Read and visualize data </b>
+=======
+>>>>>>> e9bfc72ed948b82244b1b3f3849daf1e004c2482
 
 -- Partition data into training and test sets
 

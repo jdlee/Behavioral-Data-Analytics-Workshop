@@ -6,6 +6,7 @@ output:
   ioslides_presentation:
     widescreen: yes
   beamer_presentation: default
+
 ---
 
 <style>
@@ -115,7 +116,11 @@ ggplot(sleep.df, aes(x = Days, y = Reaction, group = Subject)) +
 --Replicate what we just showed in an R notebook
 -- Create a Notebook: File>>New file>> R Notebook
 
+<<<<<<< HEAD
 -- Load the lme4, skimr, and tidyverse packages
+=======
+-- Load the lmer, skimr, and tidyverse packages
+>>>>>>> e9bfc72ed948b82244b1b3f3849daf1e004c2482
 
 -- Create the dataframe ``sleep.df`` by setting it equal to ``sleepstudy``
 

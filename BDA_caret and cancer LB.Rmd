@@ -1,0 +1,152 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+This example is based on https://www.kaggle.com/sindhuee/r-caret-example
+and https://www.kaggle.com/cesartrevisan/using-xgboost-to-predict-breast-cancer
+using the same terminology (for the most part from Section 6)
+with some revisions by Linda Boyle
+
+
+##Load packages
+```{r}
+library(caret)
+library(tidyverse)
+library(skimr)
+```
+
+##Read data in subdirectory called Data
+```{r}
+cancer.df<- read.csv('./Data/cancer.csv')
+#head(cancer.df)  #view only the first few lines of data
+#str(cancer.df) #review the structure of the data
+skim(cancer.df)
+```
+
+#Clean and prepare data
+```{r}
+cancer.df<- subset(cancer.df,select=-c(id)) #select everything but the first column
+cancer.df$diagnosis<-factor(cancer.df$diagnosis)  #make diagnosis a factor
+```
+#Visualize data
+```{r}
+table(cancer.df$diagnosis)  #B=benign, M=malignant
+
+featurePlot(x = cancer.df[, 2:11], y = cancer.df$diagnosis, 
+            plot = "density",
+            scales=list(x=list(relation="free"),y=list(relation="free")),
+            auto.key=list(columns=2), #add a key at the top
+            layout = c(3, 4))
+```
+
+#partition data into training and testing
+```{r}
+
+#From the Slides
+inTrain = createDataPartition(cancer.df$diagnosis, 
+                              p = 3/4, 
+                              list = FALSE)
+trainDescr = cancer.df[inTrain, -(1:2)] # All but class variable
+testDescr = cancer.df[-inTrain, -(1:2)]
+trainClass = cancer.df$diagnosis[inTrain]
+testClass = cancer.df$diagnosis[-inTrain]
+
+
+cancer.df$diagnosis %>% table() %>% prop.table() %>% round(2)*100  #proportion in entire table
+trainClass %>% table() %>% prop.table() %>% round(2)*100  #proportion in training
+testClass %>% table() %>% prop.table() %>% round(2)*100   #proportion in testing
+
+```
+
+#Preprocessing of data
+
+```{r}
+xTrans = preProcess(trainDescr, method = c("center", "scale"))
+trainScaled = predict(xTrans, trainDescr)
+testScaled = predict(xTrans, testDescr)
+
+```
+
+#Set a 10 fold cross validation, repeated 3x to be used in the forthcoming models
+For more on n-cross validation and repeated cross validation, see http://appliedpredictivemodeling.com/blog/2014/11/27/vpuig01pqbklmi72b8lcl3ij5hj2qm
+
+
+```{r}
+fitControl<-trainControl(
+  method ="repeatedcv",     #repeated cross validation
+  number=10,                #10 fold
+  repeats=3,                #3 times; to gain precision 
+  classProbs =TRUE,         #to obtain class predictions
+  savePredictions = 'final',
+  summaryFunction=twoClassSummary
+)
+```
+
+
+#logistic regression
+```{r}
+glm.fit<-train(x = trainScaled, y = trainClass, method='glm', family=binomial(), 
+            metric='ROC', #set model for binary logit
+            trControl=fitControl)
+glm.fit
+```
+#svm
+## Train Models and Tune Hyperparameters: Support vector machine{.smaller}
+```{r, train_svm, cache=TRUE,  echo=TRUE, message=FALSE, warning=FALSE, fig.height=3}
+grid = expand.grid(C = c(.1, .2, .4, 1, 2, 4))
+svm.fit =  train(x = trainScaled, y = trainClass,
+  method = "svmLinear", metric = "ROC",
+  tuneGrid = grid, # Overrides tuneLength
+  tuneLength = 3, # Number of levels of each hyper parameter, unless specified by grid
+  trControl = fitControl, scaled = TRUE)
+
+plot(svm.fit)
+```
+
+
+#xgboost
+```{r}
+
+xgb.fit = train(x = trainScaled, y = trainClass, 
+                method = "xgbTree", metric = "ROC",
+                tuneLength = 3, # Depends on number of parameters in algorithm 
+                trControl = fitControl, scaled = TRUE)
+xgb.fit
+
+plot(xgb.fit)
+```
+
+#feature importance
+```{r}
+varImp(glm.fit)
+varImp(svm.fit)
+varImp(xgb.fit)
+```
+
+#predict on test dataset
+```{r}
+glm.fit_pred<-predict(glm.fit,testScaled)
+svm.fit_pred<-predict(svm.fit,testScaled)
+xgb.fit_pred<-predict(xgb.fit,testScaled)
+```
+
+#results
+```{r}
+confusionMatrix(xgb.fit_pred,testClass)
+confusionMatrix(xgb.fit_pred,testClass)
+```
+#compare models
+```{r}
+mod.resamps = resamples(list(glm = glm.fit, xgb = xgb.fit, svm=svm.fit)) 
+bwplot(mod.resamps, metric="ROC")
+```
+
+
+
+
+
+
+

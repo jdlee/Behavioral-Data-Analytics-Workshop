@@ -3,9 +3,9 @@ title: "Hierarchical Linear Models"
 author: "John D. Lee and Linda Ng Boyle"
 date: 10/28/2019
 output:
+  beamer_presentation: default
   ioslides_presentation:
     widescreen: yes
-  beamer_presentation: default
 ---
 <style>
 pre {
@@ -167,8 +167,13 @@ ggplot(CI.lme.df, aes(Variable)) +
 
 ggplot(sleep.df, aes(Days, Reaction)) + 
   geom_point(alpha = .4, size = 1) +
+<<<<<<< HEAD
   geom_line(aes(y = prediction_int_slope, group = Subject)) + 
   geom_point(aes(y = prediction_int_slope), shape = 21) +
+=======
+  geom_line(aes(y=prediction_int_slope, group = Subject)) + 
+  geom_point(aes(y=prediction_int_slope), shape = 21) +
+>>>>>>> e9bfc72ed948b82244b1b3f3849daf1e004c2482
   facet_grid(.~reorder(Subject, Reaction))
 
 ```

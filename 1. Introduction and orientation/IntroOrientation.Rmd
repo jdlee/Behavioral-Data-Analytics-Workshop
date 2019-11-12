@@ -51,6 +51,7 @@ Rule 5: Record all intermediate results (Create code chunks in R Notebook with i
 ## Workshop Purpose: Promote replicable research{.build}
 Sandve, G. K., Nekrutenko, A., Taylor, J., & Hovig, E. (2013). Ten simple rules for reproducible computational research. \textit{PLoS Computational Biology}, 9(10), 1-4. 
 
+<<<<<<< HEAD
 
 Rule 6: For analyses that include randomness set random number seed (Run set.seed(42))
 
@@ -60,12 +61,27 @@ Rule 8: Generate hierarchical analysis output (Use R Studio Project file)
 
 Rule 9: Connect textual statements to underlying results (Use R Notebook)
 
+=======
+
+Rule 6: For analyses that include randomness (Run set.seed(42))
+
+Rule 7: Always store raw data behind plots (Run script in R)
+
+Rule 8: Generate hierarchical analysis output (Use R Studio Project file)
+
+Rule 9: Connect textual statements to underlying results (Use R Notebook)
+
+>>>>>>> e9bfc72ed948b82244b1b3f3849daf1e004c2482
 Rule 10: Provide public access to scripts, runs, and results (Use GitHub through RStudio)
 
 ---
 
 ```{r typesofML, echo = FALSE, warning=FALSE}
+<<<<<<< HEAD
 knitr::include_graphics("PhDComicsVersionControl.png", dpi = 120) # 200 for pdf 120
+=======
+knitr::include_graphics("PhDComicsVersionControl.png", dpi = 120)
+>>>>>>> e9bfc72ed948b82244b1b3f3849daf1e004c2482
 ```
 
 
@@ -90,7 +106,11 @@ knitr::include_graphics("PhDComicsVersionControl.png", dpi = 120) # 200 for pdf 
 <br />
 <br />
 
+<<<<<<< HEAD
 -- Overview of machine learning
+=======
+-- Multi-level general linear models: <br /> Not just accommodating correlated responses with repeated measures designs
+>>>>>>> e9bfc72ed948b82244b1b3f3849daf1e004c2482
 
 -- Machine learning overview and implementation
 
