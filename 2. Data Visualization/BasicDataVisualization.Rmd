@@ -1,7 +1,7 @@
 ---
 title: "Basic Data Visualization with ggplot2"
 author: "John D. Lee and Linda Ng Boyle"
-date: 10/1/2018
+date: 10/28/2019
 output:
   ioslides_presentation:
     widescreen: yes
@@ -10,6 +10,7 @@ output:
 
 <style>
 .forceBreak { -webkit-column-break-after: always; break-after: column; column-width: 500px }
+
 </style>
 
 ```{r setup, include=FALSE, warnings=FALSE}
@@ -27,7 +28,7 @@ rm(list = ls(all = TRUE))
 ```
 
 
-## ggplot2 for Data Visualization{.build .smaller}
+## ggplot2 for Data Visualization{.build}
 
 -- skimr provides a simple summary of data
 
@@ -41,8 +42,10 @@ rm(list = ls(all = TRUE))
   
   - Reordering for easy comparisons
   
+  
+## ggplot2 for Data Visualization{.build}
 
-> -- Typical repeated measures data: "sleepstudy"
+ -- Typical repeated measures data: "sleepstudy"
 
   - Reaction (reaction time)
   
@@ -97,7 +100,7 @@ ggplot(data = sleep.df, mapping = aes(x = as.factor(Days), y = Reaction)) +
 ## Grouped Scatterplot with Linear Regression|Slopes and intercepts both vary across people{.smaller}
 ```{r scatterplot_lm, echo = TRUE, warnings=FALSE, fig.height=4, fig.width=10.25}
 
-ggplot(sleep.df, aes(Days, Reaction, group = Subject)) + 
+ggplot(sleep.df, aes(x = Days, y = Reaction, group = Subject)) + 
   geom_line(alpha = .33) +
   geom_smooth(method = "lm", se = FALSE, size = .8)
 
@@ -112,11 +115,11 @@ ggplot(sleep.df, aes(Days, Reaction, group = Subject)) +
 --Replicate what we just showed in an R notebook
 -- Create a Notebook: File>>New file>> R Notebook
 
--- Load the lme, skimr, and ggplot2 packages
+-- Load the lme4, skimr, and tidyverse packages
 
 -- Create the dataframe ``sleep.df`` by setting it equal to ``sleepstudy``
 
--- Use skimr to summarize the data
+-- Use ``skimr`` to summarize the data
 
 -- Use ggplot2 to create simple scatterplot of reaction time and day, and set the color to ``darkred``
 
@@ -156,12 +159,10 @@ ggplot(sleep.df, aes(Days, Reaction)) +
 ## Faceted Scatterplot with Linear Regression|Subjects ordered by mean reaction time{.smaller}
 ```{r facet_scatterplot_lm_reordered, echo = TRUE, warnings=FALSE, fig.height=3.25, fig.width=10.25}
 
-sleep.df = sleep.df %>%  mutate(Subject = reorder(Subject, Reaction, mean))
-
 ggplot(sleep.df, aes(Days, Reaction)) + 
   geom_point() +
   geom_smooth(method = "lm") +
-  facet_grid(.~Subject)
+  facet_grid(.~reorder(x = Subject, X = Reaction, FUN = mean))
 ```
 
 
@@ -183,7 +184,7 @@ ggplot(sleep.df, aes(Days, Reaction)) +
 
 <br />
 
--- Loess and linear regression layers
+-- Layering to show data and model: <br />Loess and linear regression layers
 
 -- Faceting for small multiples
 
@@ -193,7 +194,7 @@ ggplot(sleep.df, aes(Days, Reaction)) +
 <p class="forceBreak"></p>
 ```{r facetedtimeseries, echo = FALSE, warning=FALSE}
 
-include_graphics("edrplot.png", dpi = 125)
+knitr::include_graphics("edrplot.png", dpi = 125)
 
 ```
 

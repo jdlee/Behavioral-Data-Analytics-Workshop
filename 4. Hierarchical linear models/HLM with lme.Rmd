@@ -1,7 +1,7 @@
 ---
 title: "Hierarchical Linear Models"
 author: "John D. Lee and Linda Ng Boyle"
-date: 10/1/2018
+date: 10/28/2019
 output:
   ioslides_presentation:
     widescreen: yes
@@ -27,6 +27,7 @@ library(skimr)
 library(lme4)
 library(lmerTest)
 library(psycho)
+library(scales)
 set.seed(1)
 rm(list = ls(all = TRUE))
 ```
@@ -37,16 +38,15 @@ rm(list = ls(all = TRUE))
 
 -- Multiple exposures across people to the same stimuli
 
--- Repeated measures ANOVA accommodates correlated observations
+-- Repeated-measures ANOVA accommodates correlated observations due to differences between people
 
--- Multi-level general linear models go further and explicitly model grouping effects 
+-- Multi-level general linear models go further and explicitly model general grouping effects (e.g., sampled stimuli)
 
 -- Addresses Simpson's paradox, where individual trends don't reflect the aggregate trend
 
 
 ## Simpson's Paradox
-```{r simpons_pardox, echo = TRUE, warnings=FALSE, fig.height=5.25, fig.width=6.5, echo=FALSE}
-library(scales)
+```{r simpons_pardox, echo = FALSE, warnings=FALSE, fig.height=4.75, fig.width=6., echo=FALSE}
 set.seed(123)
 n = 1000
 
@@ -79,7 +79,7 @@ ggplot(data, aes(Neuroticism, Salary)) +
 ## Useful packages
 -- ``library(tidyverse)`` for ggplot2, dplyr
 
--- ``library(skimr)`` for skim 
+-- ``library(skimr)`` for skim, which provides a quick overview of data 
 
 -- ``library(lme4)`` for mixed effect, multi-level general linear models
 
@@ -95,7 +95,7 @@ sleep.df = sleepstudy
 ggplot(sleep.df, aes(Days, Reaction)) + 
    geom_point() +
    geom_smooth(method = "lm") +
-   facet_grid(.~Subject)
+   facet_grid(.~reorder(Subject, Reaction))
 ```
 
 
@@ -116,7 +116,7 @@ ggplot(sleep.df, aes(Days, Reaction)) +
   geom_point(alpha = .4, size = 1) +
   geom_point(aes(y=prediction), shape = 21) +
   geom_line(aes(y=prediction)) + 
-  facet_grid(.~Subject)
+  facet_grid(.~reorder(Subject, Reaction))
 ```
 
 
@@ -139,17 +139,25 @@ ggplot(sleep.df, aes(Days, Reaction)) +
   geom_point(alpha = .4, size = 1) +
   geom_point(aes(y=prediction_int), shape = 21) +
   geom_line(aes(y=prediction_int, group = Subject)) + 
-  facet_grid(.~Subject)
+  facet_grid(.~reorder(Subject, Reaction))
 
 ```
 
 ## Random Effect for Intercept and Slope
 ```{r lmer_int_slope, echo = TRUE, warnings=FALSE, fig.height=4, fig.width=10.25}
 
-sleep_int_slope.fit = lmer(Reaction ~ Days + (Days|Subject), sleep.df)
+sleep_int_slope.fit = lmer(Reaction ~ Days + (Days|Subject), data = sleep.df)
 summary(sleep_int_slope.fit)
 
+CI.lme.df = analyze(sleep_int_slope.fit)$summary
+
 sleep.df$prediction_int_slope = predict(sleep_int_slope.fit)
+
+ggplot(CI.lme.df, aes(Variable)) +
+    geom_hline(yintercept = 0, alpha = .5)+
+    geom_pointrange(aes(y = Coef, ymin= CI_lower, ymax = CI_higher)) +
+    coord_flip() +
+    labs(x = "", y = expression(Coefficient~and~95^{th}~CI))
 
 ```
 
@@ -159,9 +167,9 @@ sleep.df$prediction_int_slope = predict(sleep_int_slope.fit)
 
 ggplot(sleep.df, aes(Days, Reaction)) + 
   geom_point(alpha = .4, size = 1) +
-  geom_line(aes(y=prediction_int_slope, group = Subject)) + 
-  geom_point(aes(y=prediction_int_slope), shape = 21) +
-  facet_grid(.~Subject)
+  geom_line(aes(y = prediction_int_slope, group = Subject)) + 
+  geom_point(aes(y = prediction_int_slope), shape = 21) +
+  facet_grid(.~reorder(Subject, Reaction))
 
 ```
 
@@ -214,11 +222,14 @@ ggplot(CI.lme.df, aes(Variable)) +
 
 ## Exercise|Multi-level model fitting
 
--- Fit a multi-level model with Subject as a random variable
+-- Load packages ``lme4``, ``lmeTest``, ``pscyho`` 
 
--- Use the ``analyze`` command from psych to extract an summmary of effects
+-- Fit a multi-level model with Subject as a random variable 
 
--- Plot the effect estimates
+-- Use the ``analyze`` command from ``psycho`` to extract an summmary of effects
+
+-- Plot estimates of fixed effect (Days), plot predictions if you finish early
+
 
 ```{r glmfit, echo = FALSE, warning=FALSE, fig.height=3.}
 
@@ -240,9 +251,9 @@ ggplot(CI.lme.df, aes(Variable)) +
 
 -- Multiple exposures across people to the same stimuli
 
--- Repeated measures ANOVA accommodates correlated observations
+-- Repeated-measures ANOVA accommodates correlated observations due to differences between people
 
--- Multi-level general linear models go further and explicitly model grouping effects
+-- Multi-level general linear models go further and explicitly model grouping effects (e.g., sampled stimuli)
 
 -- Addresses Simpson's paradox, where individual trends don't reflect the aggregate trend
 

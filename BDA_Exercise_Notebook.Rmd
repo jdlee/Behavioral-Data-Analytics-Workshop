@@ -1,0 +1,296 @@
+---
+title: "Behavial Data Analytics Exercises"
+output: html_notebook
+font-family: 'Helvetica'
+---
+
+
+# Morning: Data visualization and reduction
+## Load packages
+```{r}
+library(tidyverse)
+library(skimr)
+library(broom)
+library(ggforce)
+library(broom)
+library(lme4)
+library(lmerTest)
+library(psycho)
+library(caret)
+library(kernlab)
+library(ipred)
+library(e1071)
+library(xgboost)
+library(ipred)
+library(FFTrees)
+#library(checkpoint)
+
+#dir.create(".checkpoint")
+# checkpoint("2018-09-21", checkpointLocation = getwd()) # Downloads package versions associated with a specific date
+set.seed(42) # Sets random seed to promote replication
+rm(list = ls(all = TRUE))
+
+```
+
+
+```{r}
+
+```
+
+
+
+## Read and skim data
+```{r}
+sleep.df = sleepstudy
+
+skim(sleep.df)
+
+```
+
+## Simple scatterplot
+thebnsehg thes ehwhejthe hshes 
+```{r}
+ggplot(data = sleep.df, aes(x = Days, y = Reaction)) + 
+  geom_point(colour = "darkred")
+
+```
+
+
+
+
+## Faceted scatterplot
+```{r}
+
+ggplot(sleep.df, aes(Days, Reaction)) + 
+  geom_point() +
+  geom_smooth() +
+  facet_grid(.~Subject)
+
+
+ggplot(sleep.df, aes(Days, Reaction)) + 
+  geom_point() +
+  geom_smooth(method = "lm") +
+  facet_grid(Subject~.)
+
+ggplot(sleep.df, aes(Days, Reaction)) + 
+  geom_point() +
+  geom_smooth(method = "lm") +
+  facet_grid(.~reorder(Subject, Reaction, sd))
+
+```
+
+
+
+
+## Simple data aggregation
+```{r}
+
+sum.sleep.df = sleep.df %>% group_by(Days) %>% 
+  summarise(m_Reaction = mean(Reaction), sd_Reaction = sd(Reaction))
+  
+ggplot(sum.sleep.df, aes(x = Days)) +
+  geom_pointrange(aes(y = m_Reaction, ymin = m_Reaction-sd_Reaction, ymax = m_Reaction+sd_Reaction))
+
+
+sum.sleep.df = sleep.df %>% group_by(Days) %>% 
+  summarise(m_Reaction = mean(Reaction), 
+            q_25 = quantile(Reaction, prob = .25), q_75 = quantile(Reaction, prob = .75)
+            )
+
+ggplot(sum.sleep.df, aes(x = Days)) +
+  geom_pointrange(aes(y = m_Reaction, ymin = q_25, ymax = q_75))
+
+```
+
+
+
+
+## Model and merge
+```{r}
+
+models = sleep.df %>% group_by(Subject) %>% 
+  do(fit = lm(Reaction ~ Days, data = ., na.action = na.exclude)) 
+
+s.model = models %>% glance(fit) # Extracts summary of models
+
+s.sleep.df = sleep.df %>% group_by(Subject) %>% summarise(m.rt = mean(Reaction))
+
+augmented.s.sleep.df = left_join(s.sleep.df, s.model, by = c("Subject"))
+
+ggplot(augmented.s.sleep.df, aes(m.rt, r.squared)) + 
+  geom_point()
+
+```
+
+
+
+## General linear model for repeated measures: Effect plot
+```{r}
+library(lme4) 
+library(lmerTest) 
+library(psycho) 
+
+sleep_int.fit = lmer(Reaction ~ Days + (1|Subject), sleep.df)
+
+CI.lme.df = analyze(sleep_int.fit)$summary
+
+ggplot(CI.lme.df, aes(Variable)) +
+    geom_hline(yintercept = 0, alpha = .5)+
+    geom_pointrange(aes(y = Coef, ymin= CI_lower, ymax = CI_higher)) +
+    coord_flip() +
+    labs(x = "", y = expression(Coefficient~and~95^{th}~CI))
+
+```
+
+
+
+## General linear model for repeated measures: Prediction plot
+```{r}
+sleep.df$prediction = predict(sleep_int.fit)
+
+ggplot(sleep.df, aes(Days, Reaction)) + 
+  geom_point(alpha = .4, size = 1) +
+  geom_line(aes(y = prediction, group = Subject)) + 
+  geom_point(aes(y = prediction), shape = 21) +
+  facet_grid(.~reorder(Subject, Reaction, mean))
+
+```
+
+
+
+
+
+
+# Afternoon: Machine learning
+
+## Read, skim, discretize, and plot the wine data 
+```{r}
+
+## Read and skim data
+wine.df = read_csv("winequality-red.csv")
+skim(wine.df)
+
+## Discretize and plot wine quality
+quality.wine.df = wine.df %>% mutate(goodwine = if_else(quality>5, "good", "bad")) %>% 
+  mutate(goodwine = as.factor(goodwine))
+wine.df = quality.wine.df %>% select(-quality) # Remove quality variable to avoid training on outcome
+
+ggplot(quality.wine.df, aes(quality)) +
+  geom_histogram()
+
+ggplot(quality.wine.df, aes(goodwine, quality, colour = goodwine, fill = goodwine))+
+  geom_point(size = .5, alpha = .7, position = position_jitter(height = 0.1))+
+  labs(x = "Discretized wine quality", y = "Rated wine quality")+
+  theme(legend.position = "none")
+
+```
+
+
+## Partition data into training and test sets
+```{r}
+inTrain = createDataPartition(wine.df$goodwine, p = 3/4, list = FALSE) 
+
+trainDescr = wine.df[inTrain, -12] # All but class variable
+testDescr = wine.df[-inTrain, -12]
+
+trainClass = wine.df$goodwine[inTrain] 
+testClass = wine.df$goodwine[-inTrain]
+
+
+## Assess proportions
+wine.df$goodwine %>%  table() %>% prop.table() %>% round(3)*100 
+trainClass %>% table() %>% prop.table() %>% round(3)*100
+testClass %>% table() %>% prop.table() %>% round(3)*100
+
+```
+
+
+## Pre-process data
+```{r}
+xTrans = preProcess(trainDescr, method = c("center", "scale")) 
+trainScaled = predict(xTrans, trainDescr) %>% as.matrix()
+testScaled = predict(xTrans, testDescr) %>% as.matrix()
+```
+
+
+## Train logistic regression model
+```{r}
+## Specifiy training control 
+train.control = trainControl(method = "repeatedcv", 
+                              number = 10, repeats = 3, # number: number of folds
+                              search = "grid", # for tuning hyperparameters
+                              classProbs = TRUE,
+                              savePredictions = "final",
+                              summaryFunction = twoClassSummary)
+
+
+## Train model
+glm.fit = train(x = trainScaled, y = trainClass,
+   method = 'glm', metric = "ROC",
+   trControl = train.control) 
+
+glm.fit
+
+```
+
+
+
+## Train support vector machine model
+```{r}
+
+grid = expand.grid(C = c(.1, .2, .4, 1, 2, 4))
+svm.fit =  train(x = trainScaled, y = trainClass,
+  method = "svmLinear", metric = "ROC",
+  tuneGrid = grid, # Overrides tuneLength
+  tuneLength = 3, # Number of levels of each hyper parameter, unless specified by grid
+  trControl = train.control, scaled = TRUE)
+
+plot(svm.fit)
+
+```
+
+
+
+## Train xgboost decision tree model
+```{r}
+
+xgb.fit = train(x = trainScaled, y = trainClass,
+  method = "xgbTree", metric = "ROC",
+  tuneLength = 3, # Depends on number of parameters in algorithm
+  trControl = train.control, scaled = TRUE)
+
+plot(xg.fit)
+```
+
+
+
+## Assess model performance
+```{r}
+## GLM
+glm.pred = predict(glm.fit, testScaled)
+confusionMatrix(glm.pred, testClass)
+
+## SVM
+svm.pred = predict(svm.fit, testScaled)
+confusionMatrix(svm.pred, testClass)
+
+## XGBoost
+xgb.pred = predict(xgb.fit, testScaled)
+confusionMatrix(xgb.pred, testClass)
+
+```
+
+
+## Compare models
+```{r}
+mod.resamps = resamples(list(glm = glm.fit, svm = svm.fit, xgb = xgb.fit))
+
+bwplot(mod.resamps, metric="ROC")
+
+dotplot(mod.resamps, metric="ROC")
+
+```
+
+
+
+

@@ -1,10 +1,10 @@
 ---
 title: "Survey of Machine Learning Methods and Resources"
 author: "John D. Lee and Linda Ng Boyle"
-date: 10/1/2018
+date: "10/28/2019"
 output:
   ioslides_presentation:
-    widescreen: true
+    widescreen: yes
 ---
 
 
@@ -30,8 +30,12 @@ rm(list = ls(all = TRUE))
 
 -- Machine learning resources
 
+<span style="font-size:.75em">
+Friday 8:30 Grand Ballroom C, Human in Focus: Feature research and application of ubiquitous user monitoring
+</span>
 
-## Machine Learning Challenges and Opportunities|Issues that behavioral scientists can help address
+
+## Machine Learning Challenges and Opportunities|Issues that behavioral scientists can help address{.build}
 
 -- Representative sampling
 
@@ -45,26 +49,23 @@ rm(list = ls(all = TRUE))
 
 -- Design thinking and systems thinking
 
-<span style="font-size:.75em">
-Tuesday 1:30 Salon B, Machine Learning and Human Factors: Status, Applications, and Future Directions
-</span>
 
 
 ## Machine Learning Techniques|Text analysis: Quantitative analysis of qualitative data 
 
-```{r, out.width="50%"}
+```{r, out.width="60%"}
 knitr::include_graphics("TopicNetwork.png")
+
 ```
 
-<span style="font-size:.5em">
-Tuesday 6:00 Salon E, Understanding Attitudes Towards Self-Driving Vehicles <br> 
-Wednesday 11:00, Fellows poster, Franklin Hall Foyer
+<span style="font-size:.75em">
+Lee, J. D., & Kolodge, K. (2019). Exploring trust in self-driving vehicles with text analysis. Human Factors. 
 </span>
 
 
 ## Machine Learning Techniques|Visualizing multidimensional data 
 
-```{r umap_visualiztion, echo=FALSE, message=FALSE, warning=FALSE, cache = TRUE, out.width="70%"}
+```{r umap_visualiztion, echo=FALSE, message=FALSE, warning=FALSE, cache = TRUE, out.width="85%"}
 set.seed(42)
 
 wine.df = read_csv("winequality-red.csv")
@@ -86,9 +87,7 @@ ggplot(wine_umap.df, aes(x, y, colour = quality>5))+
 
 ```
 
-<span style="font-size:.5em">
-Thursday 8:00 Franklin, Looking at mind wandering 
-</span>
+
 
 
 ## Machine learning resources: caret
@@ -162,7 +161,7 @@ knitr::include_graphics("DataCamp.jpg")
 https://www.datacamp.com/courses/machine-learning-toolbox
 
 
-## Workshop Summary
+## Workshop Summary{.build}
 Human Factors contributions to ML and ML contributions to Human Factors
 
 -- Data visualization: Don't venture into uncharted territory
@@ -176,3 +175,8 @@ Human Factors contributions to ML and ML contributions to Human Factors
 -- Survey of machine learning behavioral issues and applications: Design for people
 
 Repeatable data analysis with R and RStudio
+
+<span style="font-size:.75em">
+Friday 8:30 Grand Ballroom C, Human in Focus: Feature research and application of ubiquitous user monitoring
+</span>
+

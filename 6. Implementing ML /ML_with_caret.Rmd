@@ -1,7 +1,7 @@
 ---
 title: "Implementing Machine Learning"
 author: "John D. Lee and Linda Ng Boyle"
-date: "10/1/2018"
+date: 10/28/2019
 output:
   ioslides_presentation:
     widescreen: yes
@@ -28,36 +28,36 @@ library(caret)
 library(kernlab)
 library(ipred)
 library(ggpubr)
-library(checkpoint)
+#library(checkpoint)
 
 library(ROCR)
 library(pROC)
 library(plotROC)
 
 
-checkpoint("2018-09-26")
+#checkpoint("2018-09-26")
 set.seed(42)
 rm(list = ls(all = TRUE))
 ```
 
 
-## General Types of Supervised Learning 
+## Types of Supervised Learning 
 
 -- Regression (predict a continuous variable) with "wine quality" dataset
 
 -- Classification (predict category membership) with "breast cancer" dataset
 
--- Classification (predict category membership) with "wine quality" dataset:
+-- Classification (predict category membership) with "wine quality" dataset:<br />
 Good and bad wine
 
 
 ## Kaggle Data Repository (https://www.kaggle.com)
 -- Kaggle hosts machine learning competitions, data, and advice
 
--- Wisconsin Cancer Diagnosis Data
+-- Wisconsin Cancer Diagnosis Data <br />
 https://www.kaggle.com/uciml/breast-cancer-wisconsin-data
    
--- Wine Quality Data
+-- Wine Quality Data <br />
 https://www.kaggle.com/uciml/red-wine-quality-cortez-et-al-2009
 
 
@@ -75,7 +75,9 @@ http://topepo.github.io/caret/index.html
 -- Incorporates sensible defaults that often work well
 
 
-##  Simplified Machine Learning Process
+##  Simplified Machine Learning Process{.build}
+
+<b> -- Read and visualize data </b>
 
 -- Partition data into training and test sets
 
@@ -90,13 +92,15 @@ http://topepo.github.io/caret/index.html
 -- Compare model performance
 
 
-## Read and Visualize Data
+## Read and Visualize Data{.smaller}
+
 ```{r read_data, echo = TRUE, warning=FALSE, message=FALSE}
 
 wine.df = read_csv("winequality-red.csv")
 skim(wine.df)
 
 ```
+|
 
 
 ## Read and Visualize Data
@@ -115,20 +119,35 @@ featurePlot(x = wine.df[, 2:11], y = wine.df$quality,
 
 quality.wine.df = wine.df %>% mutate(goodwine = if_else(quality>5, "good", "bad")) %>% 
   mutate(goodwine = as.factor(goodwine))
+wine.df = quality.wine.df %>% select(-quality)
 
 ggplot(quality.wine.df, aes(goodwine, quality, colour = goodwine, fill = goodwine))+
   geom_point(size = .5, alpha = .7, position = position_jitter(height = 0.1))+
   labs(x = "Discretized wine quality", y = "Rated wine quality")+
   theme(legend.position = "none")
-
-wine.df = quality.wine.df %>% select(-quality)
-
 ```
+
+##  Simplified Machine Learning Process:
+Exercise: read, skim, discretize, and plot the wine data
+
+<b> -- Read and visualize data </b>
+
+-- Partition data into training and test sets
+
+-- Pre-process data and select features
+
+-- Tune model hyperparameters with cross validation
+
+-- Estimate variable importance 
+
+-- Assess predictions and model performance with test data
+
+-- Compare model performance
 
 
 ## Holdout Validation
 ```{r fitvalidation, echo = FALSE, warning=FALSE,fig.height=7}
-knitr::include_graphics("1.FittingValidation.png", dpi=120)
+knitr::include_graphics("1.FittingValidation.png", dpi=120) #2* for pdf
 ```
 
 
@@ -165,6 +184,23 @@ trainClass %>% table() %>% prop.table() %>% round(3)*100
 testClass %>% table() %>% prop.table() %>% round(3)*100
 ```
 
+##  Simplified Machine Learning Process:
+Exercise: Partition into training and test sets
+
+-- Read and visualize data 
+
+<b> -- Partition data into training and test sets </b>
+
+-- Pre-process data and select features
+
+-- Tune model hyperparameters with cross validation
+
+-- Estimate variable importance 
+
+-- Assess predictions and model performance with test data
+
+-- Compare model performance
+
 
 ## Pre-process Data: Filter poor predictors
 -- Eliminate variables with no variabilty
@@ -177,6 +213,8 @@ testClass %>% table() %>% prop.table() %>% round(3)*100
 
 
 ## Pre-process Data: Normalization
+-- ``preProcess`` creates a transformation function that can be applied to new data
+
 -- ``preProcess`` also supports other preprocessing methods, such as PCA and ICA
 
 -- ``center`` subtracts mean
@@ -200,35 +238,52 @@ ggarrange(raw.plot, scaled.plot,
           nrow=2, ncol = 1, align = "v")
 ```
 
-## Exercise: Partition and pre-process data{.build .smaller}
--- Load and review the Wisconsin cancer data
+<!-- ## Exercise: Partition and pre-process data{.build .smaller} -->
+<!-- -- Load and review the Wisconsin cancer data -->
 
-``cancer.df = read_csv("cancer.csv")``
+<!-- ``cancer.df = read_csv("cancer.csv")`` -->
 
-``skim(cancer.df)``
+<!-- ``skim(cancer.df)`` -->
 
--- Identify the diagnosis indicator
+<!-- -- Identify the diagnosis indicator -->
 
--- Partition data
+<!-- -- Partition data -->
 
-``inTrain = createDataPartition(cancer.df$diagnosis, p = 3/4, list = FALSE)``
+<!-- ``inTrain = createDataPartition(cancer.df$diagnosis, p = 3/4, list = FALSE)`` -->
 
-``trainDescr = cancer.df[inTrain, -(1:2)] # All but class variable``
+<!-- ``trainDescr = cancer.df[inTrain, -(1:2)] # All but class variable`` -->
 
-``testDescr = cancer.df[-inTrain, -(1:2)]``
+<!-- ``testDescr = cancer.df[-inTrain, -(1:2)]`` -->
 
-``trainClass = cancer.df$diagnosis[inTrain] ``
+<!-- ``trainClass = cancer.df$diagnosis[inTrain] `` -->
 
-``testClass = cancer.df$diagnosis[-inTrain]``
+<!-- ``testClass = cancer.df$diagnosis[-inTrain]`` -->
 
--- Pre-process data
+<!-- -- Pre-process data -->
 
-``xTrans = preProcess(trainDescr, method = c("center", "scale")) ``
+<!-- ``xTrans = preProcess(trainDescr, method = c("center", "scale")) `` -->
 
-``trainScaled = predict(xTrans, trainDescr)``
+<!-- ``trainScaled = predict(xTrans, trainDescr)`` -->
 
-``testScaled = predict(xTrans, testDescr)``
+<!-- ``testScaled = predict(xTrans, testDescr)`` -->
 
+
+##  Simplified Machine Learning Process:
+Exercise: Pre-process and normalize wine data
+
+-- Read and visualize data 
+
+ -- Partition data into training and test sets 
+
+<b>-- Pre-process data and select features </b>
+
+-- Tune model hyperparameters with cross validation
+
+-- Estimate variable importance 
+
+-- Assess predictions and model performance with test data
+
+-- Compare model performance
 
 
 ## Cross-validation
@@ -315,12 +370,13 @@ train.control = trainControl(method = "repeatedcv",
                               search = "grid", # for tuning hyperparameters
                               classProbs = TRUE,
                               savePredictions = "final",
-                              summaryFunction = twoClassSummary)
+                              summaryFunction = twoClassSummary
+                             )
 ```
 
 
 ## Select Models to Train
--- Over 200 different models from 50 categories (e.g., Linear regression, boosting, bagging, cost sensitive learning)
+-- Over 200 different models from 50 categories (e.g., Linear regression, boosting, bagging, cost-sensitive learning)
 
 -- List of models: http://caret.r-forge.r-project.org/modelList.html
 
@@ -355,6 +411,7 @@ train.control = trainControl(method = "repeatedcv",
 -- Cross validation provides a nearly unbiased estimate of the performance of the model on the held out data
 
 
+
 ## Train Models and Tune Hyperparameters: Logistic regression{.smaller}
 ```{r, train_glm, cache = TRUE, echo=TRUE, warning=FALSE}
 glm.fit = train(x = trainScaled, y = trainClass,
@@ -363,7 +420,22 @@ glm.fit = train(x = trainScaled, y = trainClass,
 
 glm.fit
 ```
+##  Simplified Machine Learning Process:
+Exercise: Train logistic regression model
 
+-- Read and visualize data 
+
+ -- Partition data into training and test sets 
+
+-- Pre-process data and select features 
+
+<b>-- Tune model hyperparameters with cross validation </b>
+
+-- Estimate variable importance 
+
+-- Assess predictions and model performance with test data
+
+-- Compare model performance
 
 ## Train Models and Tune Hyperparameters: Support vector machine{.smaller}
 - Linear support vector machines have a single tuning parameter--C
@@ -392,6 +464,22 @@ svm.fit =  train(x = trainScaled, y = trainClass,
 plot(svm.fit)
 ```
 
+##  Simplified Machine Learning Process:
+Exercise: Train support vector machine model
+
+-- Read and visualize data 
+
+ -- Partition data into training and test sets 
+
+-- Pre-process data and select features 
+
+<b>-- Tune model hyperparameters with cross validation </b>
+
+-- Estimate variable importance 
+
+-- Assess predictions and model performance with test data
+
+-- Compare model performance
 
 ## Train Models and Tune Hyperparameters: xgboost
 Classification depends on adding outcomes across many trees
@@ -468,25 +556,42 @@ plot(xgb.fit)
 ```
 
 
-## Exercise: Train and Tune Hyperparameters{.build}
--- Set training parameters
+<!-- ## Exercise: Train and Tune Hyperparameters{.build} -->
+<!-- -- Set training parameters -->
 
-``train.control = ``<br>
-``trainControl(method = "repeatedcv",`` <br>
-              ``number = 10, repeats = 3, # number: number of folds``<br>
-              ``search = "grid", # for tuning hyperparameters``<br>
-              ``classProbs = TRUE,``<br>
-              ``savePredictions = "final",``<br>
-              ``summaryFunction = twoClassSummary)``
-                              
--- Train an extreme boosting tree 
+<!-- ``train.control = ``<br> -->
+<!-- ``trainControl(method = "repeatedcv",`` <br> -->
+<!--               ``number = 10, repeats = 3, # number: number of folds``<br> -->
+<!--               ``search = "grid", # for tuning hyperparameters``<br> -->
+<!--               ``classProbs = TRUE,``<br> -->
+<!--               ``savePredictions = "final",``<br> -->
+<!--               ``summaryFunction = twoClassSummary)`` -->
 
-``xgb.fit = train(x = trainScaled, y = trainClass,``<br>
-  ``  method = "xgbTree", metric = "ROC",``<br>
- ``  tuneLength = 3, # Depends on number of parameters in algorithm``<br>
- ``  trControl = train.control, scaled = TRUE)``
- 
- -- Identify the best combination of Hyperparameters
+<!-- -- Train an extreme boosting tree  -->
+
+<!-- ``xgb.fit = train(x = trainScaled, y = trainClass,``<br> -->
+<!--   ``  method = "xgbTree", metric = "ROC",``<br> -->
+<!--  ``  tuneLength = 3, # Depends on number of parameters in algorithm``<br> -->
+<!--  ``  trControl = train.control, scaled = TRUE)`` -->
+
+<!--  -- Identify the best combination of Hyperparameters -->
+
+##  Simplified Machine Learning Process:
+Exercise: Train xgboost model
+
+-- Read and visualize data 
+
+ -- Partition data into training and test sets 
+
+-- Pre-process data and select features 
+
+<b>-- Tune model hyperparameters with cross validation </b>
+
+-- Estimate variable importance 
+
+-- Assess predictions and model performance with test data
+
+-- Compare model performance
 
   
 ## Assess Performance: Confusion matrix (glm)
@@ -512,6 +617,21 @@ xgb.pred = predict(xgb.fit, testScaled)
 confusionMatrix(xgb.pred, testClass)
 ```
 
+Exercise: Train logistic regression model
+
+-- Read and visualize data 
+
+ -- Partition data into training and test sets 
+
+-- Pre-process data and select features 
+
+-- Tune model hyperparameters with cross validation 
+
+-- Estimate variable importance 
+
+<b>-- Assess predictions and model performance with test data </b>
+
+-- Compare model performance
 
 ## Compare Models
 ```{r, compare_boxplot, cache=TRUE, echo=TRUE}
@@ -521,9 +641,26 @@ bwplot(mod.resamps, metric="ROC")
 # dotplot(mod.resamps, metric="ROC")
 ```
 
+##  Simplified Machine Learning Process:
+Exercise: Train support vector machine model
+
+-- Read and visualize data 
+
+-- Partition data into training and test sets 
+
+-- Pre-process data and select features 
+
+-- Tune model hyperparameters with cross validation 
+
+-- Estimate variable importance 
+
+-- Assess predictions and model performance with test data 
+
+<b>-- Compare model performance </b>
+
 
 ## Assess Performance (xgb): ROC plot{.smaller}
-```{r, assess_ROC, warning=FALSE, echo=FALSE, out.width="90%"}
+```{r, assess_ROC, warning=FALSE, echo=FALSE, out.width="90%", message= FALSE}
 xgb.pred = predict(xgb.fit, testScaled, type="prob")
 xgb.roc = roc(predictor = xgb.pred$good, 
               response = testClass, 
@@ -590,16 +727,16 @@ ggsave(filename = "predicted_wine.png", plot = predicted_wine.plot, width = 5, h
 ```
 
 
-## Exercise: Assess model performance and variable importance{.build}
--- Assess model performance
+<!-- ## Exercise: Assess model performance and variable importance{.build} -->
+<!-- -- Assess model performance -->
 
-``xgb.pred = predict(xgb.fit, testScaled)``
+<!-- ``xgb.pred = predict(xgb.fit, testScaled)`` -->
 
-``confusionMatrix(xgb.pred, testClass)``
+<!-- ``confusionMatrix(xgb.pred, testClass)`` -->
 
--- Assess variable importance
+<!-- -- Assess variable importance -->
 
-``plot(varImp(xgb.fit, scale = TRUE))``
+<!-- ``plot(varImp(xgb.fit, scale = TRUE))`` -->
 
 
 ## Addressing the Black Box Problem with Understandable Models {.smaller}
@@ -630,9 +767,10 @@ fft.fit = FFTrees(formula = goodwine~., data = train.wine.df, do.comp = FALSE)
 
 
 ## Understandable (fft) and Sophisticated (xgb) 
-```{r, compare_fft_xgb, warning=FALSE, echo=FALSE, out.width="92.5%"} 
+```{r, compare_fft_xgb, warning=FALSE,message=FALSE, echo=FALSE, out.width="90%"}
+ #900 for slides,  out.width="900
 
-fft.pred = predict(fft.fit, newdata =test.wine.df, type = "prob")
+fft.pred = predict(fft.fit, newdata = test.wine.df, type = "prob")
 fft.roc = roc(predictor = fft.pred[, 2], response = test.wine.df$goodwine,
               AUC = TRUE, ci = TRUE)
 
@@ -677,6 +815,8 @@ knitr::include_graphics("4.DeployMonitor.png", dpi=120)
 
 
 ##  Simplified Machine Learning Process
+
+-- Read and visualize data---often 90% of the total effort
 
 -- Partition data into training and test sets
 

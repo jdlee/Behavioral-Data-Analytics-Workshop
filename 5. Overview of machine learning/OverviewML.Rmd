@@ -1,7 +1,7 @@
 ---
 title: "Overview of Machine Learning: Opportunities and Challenges"
 author: "John D. Lee and Linda Ng Boyle"
-date: 10/1/2018
+date: 10/28/2019
 output:
   ioslides_presentation:
     widescreen: yes
@@ -35,12 +35,12 @@ rm(list = ls(all = TRUE))
 ## Increasing Centrality of Machine Learning in System Design|Human implications of increasingly powerful algorithms
 
 ```{r, out.width="33%"}
-knitr::include_graphics("Weapons_of_Math_Destruction.jpg")
+knitr::include_graphics("Weapons_of_Math_Destruction.jpg", dpi = 220)
 ```
 
 
 
-## Design Thinking and Systems Thinking for Machine Learning
+## Design Thinking and Systems Thinking for ML{.smaller}
 
 -- Design thinking: Empathy and understanding for person-centered solutions
 
@@ -48,9 +48,17 @@ knitr::include_graphics("Weapons_of_Math_Destruction.jpg")
 
 -- Sea-level and C-level support for success
 
+
 ```{r UCE, echo = FALSE, warning=FALSE}
-knitr::include_graphics("UCE.jpg", dpi = 210)
+knitr::include_graphics("UCE.jpg", dpi = 220) #320 for pdf
+
 ```
+
+<span style="font-size:.75em">
+Lee, J. D., Wickens, C. D., Liu, Y., & Boyle, L. N. (2017). Designing for People: An introduction to human factors engineering. Charleston, SC: CreateSpace.
+</span>
+
+
 
 
 
@@ -69,7 +77,7 @@ Practical significance|Statistical significance
 ## Holdout validation and prediction error
 
 ```{r fitvalidation, echo = FALSE, warning=FALSE,fig.height=7}
-knitr::include_graphics("1.FittingValidation.png", dpi=120)
+knitr::include_graphics("1_FittingValidation.png", dpi=120) #220 for pdf
 ```
 
 
@@ -82,7 +90,7 @@ knitr::include_graphics("1.FittingValidation.png", dpi=120)
 -- Reinforcement learning: Learning through interactions with a system
 
 ```{r typesofML, echo = FALSE, warning=FALSE}
-knitr::include_graphics("SupervisedUnsupervisedReinforcement.png", dpi = 90)
+knitr::include_graphics("SupervisedUnsupervisedReinforcement.png", dpi = 90) #190 for pdf
 ```
 <span style="font-size:.8em">
 https://www.ibm.com/developerworks/library/cc-models-machine-learning/index.html
@@ -92,7 +100,7 @@ https://www.ibm.com/developerworks/library/cc-models-machine-learning/index.html
 
 ## Supervised Learning: More than curve fitting?
 ```{r curvefitting, echo = FALSE, warning=FALSE}
-knitr::include_graphics("curve_fitting_cartoon.png", dpi = 175)
+knitr::include_graphics("curve_fitting_cartoon.png", dpi = 175) #275 for pdf
 ```
 
 
@@ -104,11 +112,11 @@ $L(\theta) =  \sum_{i=1}^n (y_i-\hat{y_i})^2 =$ Model error, ideally small bias 
 
 Objective function$(\theta) = \Omega(\theta) + L(\theta)$
 
-https://xgboost.readthedocs.io/en/latest/index.html
 ```{r tradeoffsofML, echo = FALSE, warning=FALSE}
-knitr::include_graphics("VarianceBias.png", dpi = 150)
+knitr::include_graphics("VarianceBias.png", dpi = 180) # 300 for pdf
 ```
 
+https://xgboost.readthedocs.io/en/latest/index.html
 
 
 ## Essential Tradeoffs in ML Design| Human-centered tradeoffs
@@ -126,19 +134,29 @@ $\Omega(\theta)$ Model complexity does not typically reflect perceived complexit
 
 
 
-## Essential Tradeoffs in ML Design| Hyperparameters
+## Essential Tradeoffs in ML Design| Hyperparameters{.build}
 
-Hyperparameters govern how ML algorithms fit the data and promote:
+Hyperparameters (as in $\lambda$ below) adjust algorithms to promote:
 
--- a better model fit
+-- A better model fit
 
--- a more robust model
+-- A more robust model
 
--- a more understandable model
+-- A more understandable model
+
+Standard regression: Cost function = $RSS = \sum_{i=1}^n \left(y_i - \beta_0 - \sum_{j=1}^p\beta_jx_{ij}\right)^2$
+
+Ridge regression: Cost functon $= \sum_{i=1}^n \left(y_i - \beta_0 - \sum_{j=1}^p\beta_jx_{ij}\right)^2 + \lambda \sum_{j=1}^p\beta_j^2$
+
+<span style="font-size:.75em">
+James, G., Witten, D., Hastie, T., & Tibshirani, R. (2013). An Introduction to Statistical Learning. New York: Springer New York. https://doi.org/10.1007/978-1-4614-7138-7
+</span>
 
 
 
-## HF Considerations for ML and <br> ML Considerations for HF
+
+
+## HF Considerations for ML and <br> ML Considerations for HF{.build}
 -- Human-centered ML represents a looming societal need
 
 -- Design and systems thinking is sometimes neglected with ML deployment

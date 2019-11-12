@@ -1,11 +1,11 @@
 ---
 title: "Basic Data Reduction with dplyr"
 author: "John D. Lee and Linda Ng Boyle"
-date: 10/1/2018
+date: "10/28/2019"
 output:
   ioslides_presentation:
-    widescreen: true
-
+    widescreen: yes
+  beamer_presentation: default
 ---
 
 ```{r setup, include=FALSE, warnings=FALSE}
@@ -21,7 +21,6 @@ set.seed(1)
 rm(list = ls(all = TRUE))
 ```
 
--- 
 
 ## Google Quantitative User Experience Research
 https://careers.google.com/jobs#!t=jo&jid=/google/quantitative-user-experience-researcher-google-building-41-1600-amphitheatre-1285660001&
@@ -37,7 +36,7 @@ https://careers.google.com/jobs#!t=jo&jid=/google/quantitative-user-experience-r
 ``dplyr`` is a simple way to do SQL-type data manipulation
 </span>
 
-## dplyr for Data Reduction|dplyr as grammar of data reduction
+## dplyr for Data Reduction|dplyr as grammar of data reduction{.build}
 -- ``select`` to remove variables (i.e., columns)
 
 -- ``filter`` to subset the data and remove observations (i.e., rows)
@@ -151,7 +150,7 @@ ggplot(s.sleep.df, aes(reorder(Subject, m.reaction), m.reaction)) +
 
 -- Plot the summary data using ``geom_pointrange``
 
--- Plot with 25^th^ and 75^th^ quantiles if this is too easy
+-- Plot with 25^th^ and 75^th^ quantiles if this is too easy (use ``quantile`` )
 
 ```{r meanbyday, echo = FALSE, warnings=FALSE, fig.height=3.5}
 
@@ -205,9 +204,11 @@ From: R for Data Science (Grolemund, Wickham, 2017)
 
 
 ## ``join`` to Combine Datasets{.smaller}
-```{r join_data, echo = TRUE, warnings=FALSE, fig.height=3.75, fig.width=10.25}
-a.model.df = models %>% augment(fit) # Extracts summary of models
-augmented.sleep.df = left_join(sleep.df, a.model.df, by = c("Subject", "Days", "Reaction"))
+Use "broom" to extract model predictions and diagnostics
+```{r join_data, echo = TRUE, warnings=FALSE, fig.height=3.2, fig.width=10.25}
+library(broom)
+sum.model.df = models %>% augment(fit) # Extracts summary of models
+augmented.sleep.df = left_join(sleep.df, sum.model.df, by = c("Subject", "Days", "Reaction"))
 
 ggplot(augmented.sleep.df, aes(Days, Reaction)) +
   geom_point()+
